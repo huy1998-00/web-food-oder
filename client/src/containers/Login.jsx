@@ -5,8 +5,16 @@ import { useState } from "react";
 import { FaEnvelope, FaLock, FcGoogle } from "../assets/icons";
 import { motion } from "framer-motion";
 import { ButtonClick } from "../animations";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { app } from "../config/filebase.config";
+import { validateUserJWT } from "../API";
 const Login = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -14,20 +22,89 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
+  const navigate = useNavigate();
 
   //func handle login with google
   const loginwithGoogle = async () => {
     await signInWithPopup(firebaseAuth, provider).then((userCred) => {
-      ///khi người dùng đăng nhập thành công, có thể lấy được thông tin người dung trả về từ google Auth( caanf validate access token)
+      ///khi người dùng đăng đặng nhập qua mail có thể lấy được thông tin người dung trả về từ google Auth( caanf validate access token)
       firebaseAuth.onAuthStateChanged((cred) => {
         if (cred) {
           cred.getIdToken().then((token) => {
-            //lấy token người dùng
-            console.log(token);
+            //lấy token người dùng gửi về backend qua API và nhận phản hồi
+            validateUserJWT(token).then((data) => {
+              console.log(data);
+            });
           });
         }
+        // chuyển hướng
+        navigate("/", { replace: true });
       });
     });
+  };
+  // func handle sginup với emaill and password
+
+  const signUpWithEmailPass = async () => {
+    if (userEmail === "" || userPassword === "" || confirm_Password === "") {
+      //xuw ly bo trong
+    } else {
+      if (userPassword === confirm_Password) {
+        setUserEmail("");
+        setUserPassword("");
+        setConfirm_Password("");
+
+        await createUserWithEmailAndPassword(
+          firebaseAuth,
+          userEmail,
+          userPassword
+        ).then((Usercred) => {
+          firebaseAuth.onAuthStateChanged((cred) => {
+            if (cred) {
+              cred.getIdToken().then((token) => {
+                //lấy token người dùng gửi về backend qua API và nhận phản hồi
+                validateUserJWT(token).then((data) => {
+                  setUserEmail("");
+                  setUserPassword("");
+                  setConfirm_Password("");
+                  setIsSignUp(false);
+
+                  /// cần xử lý popup message phản hổi từ backend (nêu tạo thành công)
+                });
+              });
+            } else {
+              //alert message
+              /// cần xử lý popup message phản hổi từ backend (nêu tạo thất bại)
+            }
+          });
+        });
+      }
+    }
+  };
+  /// func login with email and passs
+
+  const signInWithEmailPass = async () => {
+    if (userEmail !== "" || userPassword !== "") {
+      await signInWithEmailAndPassword(
+        firebaseAuth,
+        userEmail,
+        userPassword
+      ).then((userCred) => {
+        firebaseAuth.onAuthStateChanged((cred) => {
+          if (cred) {
+            cred.getIdToken().then((token) => {
+              //lấy token người dùng gửi về backend qua API và nhận phản hồi
+              validateUserJWT(token).then((data) => {
+                console.log(data);
+              });
+            });
+            // chuyển hướng
+            navigate("/", { replace: true });
+          } else {
+            //alert message
+          }
+        });
+      });
+    }
   };
 
   return (
@@ -53,7 +130,7 @@ const Login = () => {
           {!isSignUp ? "Sign-In" : "Sign-Up"} with following
         </p>
 
-        {/* input login */}
+        {/* user input*/}
         <div className="w-full flex flex-col md:px-12 items-center justify-center gap-6 py-4">
           <LoginInput
             placeholder={"Email here"}
@@ -113,6 +190,7 @@ const Login = () => {
             <motion.button
               {...ButtonClick}
               className="w-full px-4 py-2 rounded-md bg-red-400 hover:bg-red-500 transition-all duration-150"
+              onClick={signUpWithEmailPass}
             >
               Sign Up
             </motion.button>
@@ -120,6 +198,7 @@ const Login = () => {
             <motion.button
               {...ButtonClick}
               className="w-full px-4 py-2 rounded-md bg-red-400 hover:bg-red-500 transition-all duration-150"
+              onClick={signInWithEmailPass}
             >
               Sign In
             </motion.button>
