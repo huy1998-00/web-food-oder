@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 
-import { Main, Login } from "./containers/index";
+import { Main, Login, DashBoard } from "./containers/index";
 import { app } from "./config/filebase.config";
 import { getAuth } from "firebase/auth";
 import { FaOptinMonster } from "react-icons/fa";
@@ -53,6 +53,9 @@ const App = () => {
       <Routes>
         <Route path="*" element={<Main></Main>}></Route>
         <Route path="/login" element={<Login></Login>}></Route>
+
+        {/* cần fix route này chỉ có admin có thể truy cập được */}
+        <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
       </Routes>
 
       {/* alert popup message */}
