@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { LoginBg, Logo } from "../assets/index";
 import { LoginInput } from "../components";
 import { useState } from "react";
@@ -15,6 +15,9 @@ import {
 } from "firebase/auth";
 import { app } from "../config/filebase.config";
 import { validateUserJWT } from "../API";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserDetail } from "../context/actions/userActions";
+import { alertInfor, alertWarning } from "../context/actions/alertAcions";
 const Login = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -23,6 +26,19 @@ const Login = () => {
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  //lấy dữ liệu người dùng hiện tại
+  const user = useSelector((state) => state.user);
+
+  // alert message
+  const alert = useSelector((state) => state.alert);
+  // handle trương hợp người dùng đã đăng nhập
+  useEffect(() => {
+    if (user) {
+      navigate("/", { replace: true });
+    }
+  }, [user]);
 
   //func handle login with google
   const loginwithGoogle = async () => {
@@ -33,7 +49,8 @@ const Login = () => {
           cred.getIdToken().then((token) => {
             //lấy token người dùng gửi về backend qua API và nhận phản hồi
             validateUserJWT(token).then((data) => {
-              console.log(data);
+              // lưu vào redux
+              dispatch(setUserDetail(data));
             });
           });
         }
@@ -46,6 +63,7 @@ const Login = () => {
 
   const signUpWithEmailPass = async () => {
     if (userEmail === "" || userPassword === "" || confirm_Password === "") {
+      dispatch(alertWarning("Required field should not emty"));
       //xuw ly bo trong
     } else {
       if (userPassword === confirm_Password) {
@@ -67,13 +85,14 @@ const Login = () => {
                   setUserPassword("");
                   setConfirm_Password("");
                   setIsSignUp(false);
-
-                  /// cần xử lý popup message phản hổi từ backend (nêu tạo thành công)
+                  // lưu vào redux
+                  dispatch(setUserDetail(data));
                 });
+                /// cần xử lý popup message phản hổi từ backend (nêu tạo thành công hoac thất bại)
               });
             } else {
-              //alert message
-              /// cần xử lý popup message phản hổi từ backend (nêu tạo thất bại)
+              //alert message nếu password và confirm not match
+              dispatch(alertWarning("Confirm password not match"));
             }
           });
         });
@@ -94,13 +113,16 @@ const Login = () => {
             cred.getIdToken().then((token) => {
               //lấy token người dùng gửi về backend qua API và nhận phản hồi
               validateUserJWT(token).then((data) => {
-                console.log(data);
+                //nếu thành công, => popup pản hồi
+                // lưu vào redux
+                dispatch(setUserDetail(data));
               });
             });
             // chuyển hướng
             navigate("/", { replace: true });
           } else {
-            //alert message
+            //alert message nếu thất bại
+            dispatch(alertWarning("login fail"));
           }
         });
       });
@@ -203,7 +225,7 @@ const Login = () => {
               Sign In
             </motion.button>
           )}
-          {/* separte line với form */}
+          {/* separte line v */}
           <div className="flex items-center justify-between gap-16">
             <div className="w-24 h-[1px] rounded-md bg-white"></div>
             <p className="text-white">or</p>
