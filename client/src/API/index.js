@@ -8,7 +8,7 @@ export const validateUserJWT = async (token) => {
     const res = await axios.get(`${baseURL}/api/users/jwtVerification`, {
       headers: { Authorization: `Bearer ` + token },
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     return null;
   }
