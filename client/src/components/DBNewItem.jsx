@@ -3,18 +3,69 @@ import { useState } from "react";
 import { statuses } from "../ultis/styles";
 import { Spinner } from "../components/index";
 import { FaCloudUploadAlt } from "../assets/icons/index";
+import {
+  alertDanger,
+  alertNull,
+  alertSucess,
+} from "../context/actions/alertAcions";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../config/filebase.config";
+import { useSelector, useDispatch } from "react-redux";
 const DBNewItem = () => {
   const [itemName, setItemName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setcategory] = useState(null);
   const [isLoadding, setIsLoadding] = useState(false);
-  const [imageDownloadURL, setImagaDownloadURL] = useState(null);
+  const [imageDownloadURL, setImageDownloadURL] = useState(null);
+  const [progess, setProgess] = useState(null);
+  const alert = useSelector((state) => state.alert);
+  const dispatch = useDispatch();
 
   // function handle upload message
   const uploadImage = (e) => {
     setIsLoadding(true);
     const imageFile = e.target.files[0];
     //upload file to firebase
+    //doc/web/uploadfile
+
+    //tạo Ref storage
+    const storageRef = ref(storage, `Images/${Date.now()}_${imageFile.name}`);
+
+    // tạo task đẩy file lên firebase
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      "state_chaged",
+      (snapshot) => {
+        //handle task when still on progress
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      },
+      (error) => {
+        //handle task when fail upload
+        dispatch(alertDanger(error));
+        //remove alert
+
+        setInterval(() => {
+          dispatch(alertNull());
+        }, 3000);
+      },
+      () => {
+        //handletask when succes upload
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageDownloadURL(downloadURL);
+          //remove loadding state
+          setIsLoadding(false);
+          setProgess(null);
+
+          //alert succces
+          dispatch(alertSucess("Upload image success"));
+          setInterval(() => {
+            dispatch(alertNull());
+          }, 3000);
+        });
+      }
+    );
   };
   return (
     <div className="flex items-center justify-center flex-col pt-6 px-12 w-full">

@@ -35,12 +35,12 @@ export const alertWarning = (message) => {
   };
 };
 
-export const alertNull = (message) => {
+export const alertNull = () => {
   return {
     type: "SET_ALERT_NULL",
     alert: {
       type: "null",
-      message: message,
+      message: null,
     },
   };
 };
