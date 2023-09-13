@@ -38,4 +38,12 @@ const userRoute = require("./routes/users");
 app.use("/api/users", userRoute);
 
 //============
+
+//products route
+const productsRoute = require("./routes/products");
+
+app.use("/api/products", productsRoute);
+
+///==============================
+
 exports.app = functions.https.onRequest(app);

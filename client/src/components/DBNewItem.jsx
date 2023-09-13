@@ -2,23 +2,33 @@ import React from "react";
 import { useState } from "react";
 import { statuses } from "../ultis/styles";
 import { Spinner } from "../components/index";
-import { FaCloudUploadAlt } from "../assets/icons/index";
+import { FaCloudUploadAlt, MdDelete } from "../assets/icons/index";
 import {
   alertDanger,
   alertNull,
   alertSucess,
 } from "../context/actions/alertAcions";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { storage } from "../config/filebase.config";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
+import { motion } from "framer-motion";
+import { ButtonClick } from "../animations/index";
+import { addNewProduct, getAllProduct } from "../API";
+import { setAllProducts } from "../context/actions/productActions";
+
 const DBNewItem = () => {
   const [itemName, setItemName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setcategory] = useState(null);
   const [isLoadding, setIsLoadding] = useState(false);
   const [imageDownloadURL, setImageDownloadURL] = useState(null);
-  const [progess, setProgess] = useState(null);
-  const alert = useSelector((state) => state.alert);
+  const [progress, setProgress] = useState(null);
+
   const dispatch = useDispatch();
 
   // function handle upload message
@@ -38,15 +48,16 @@ const DBNewItem = () => {
       "state_chaged",
       (snapshot) => {
         //handle task when still on progress
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(
+          Math.trunc((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+        );
       },
       (error) => {
         //handle task when fail upload
         dispatch(alertDanger(error));
         //remove alert
 
-        setInterval(() => {
+        setTimeout(() => {
           dispatch(alertNull());
         }, 3000);
       },
@@ -56,17 +67,70 @@ const DBNewItem = () => {
           setImageDownloadURL(downloadURL);
           //remove loadding state
           setIsLoadding(false);
-          setProgess(null);
+          setProgress(null);
 
           //alert succces
           dispatch(alertSucess("Upload image success"));
-          setInterval(() => {
+          setTimeout(() => {
             dispatch(alertNull());
           }, 3000);
         });
       }
     );
   };
+
+  //func handle delete img from firebase
+  const deleteImageFromFirebase = (imageDownloadURL) => {
+    setIsLoadding(true);
+    // tạo ref file cần xóa
+    const deleteRef = ref(storage, imageDownloadURL);
+    //xóa file
+    deleteObject(deleteRef).then(() => {
+      //popup message
+      dispatch(alertSucess("Removed image"));
+      setImageDownloadURL(null);
+      setIsLoadding(false);
+    });
+
+    // remove popup
+
+    setTimeout(() => {
+      dispatch(alertNull());
+    }, 3000);
+  };
+
+  // function handle submit new data
+
+  const submitNewData = () => {
+    const data = {
+      product_name: itemName,
+      product_Category: category,
+      product_price: price,
+      imageURL: imageDownloadURL,
+    };
+    // call API
+    addNewProduct(data)
+      .then((res) => {
+        //allert message if success
+
+        setItemName("");
+        setImageDownloadURL("");
+        setPrice("");
+        setcategory(null);
+        dispatch(alertSucess("Succes add product"));
+        // update redux
+        getAllProduct().then((data) => {
+          dispatch(setAllProducts(data));
+        });
+        setTimeout(() => {
+          dispatch(alertNull());
+        }, 3000);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className="flex items-center justify-center flex-col pt-6 px-12 w-full">
       {/* new item form */}
@@ -84,6 +148,7 @@ const DBNewItem = () => {
             statuses?.map((data) => {
               return (
                 <p
+                  //update category
                   onClick={() => setcategory(data.category)}
                   className={`px-4 py-3 rounded-md text-xl text-textColor font-semibold  cursor-pointer hover:shadow-md border border-gray-200 backdrop-blur-md ${
                     data.category === category
@@ -108,6 +173,29 @@ const DBNewItem = () => {
           {isLoadding ? (
             <div className="h-full w-full flex flex-col items-center justify-evenly px-24">
               <Spinner></Spinner>
+              {Math.round(progress > 0) && (
+                <div className=" w-full flex flex-col items-center justify-center gap-2">
+                  <div className="flex justify-between w-full">
+                    <span className="text-base font-medium text-textColor">
+                      Progress
+                    </span>
+                    <span className="text-sm font-medium text-textColor">
+                      {Math.round(progress) > 0 && (
+                        <>{`${Math.round(progress)}%`}</>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-red-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                      style={{
+                        width: `${Math.round(progress)}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <>
@@ -134,11 +222,36 @@ const DBNewItem = () => {
                   </label>
                 </>
               ) : (
-                <></>
+                <>
+                  {/* display image when succes upload */}
+                  <div className="relative w-full h-full overflow-hidden rounded-md">
+                    <motion.img
+                      src={imageDownloadURL}
+                      className="w-full h-full object-cover"
+                    />
+
+                    <motion.button
+                      {...ButtonClick}
+                      type="button"
+                      className="absolute top-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md duration-500 transition-all ease-in-out"
+                      onClick={() => deleteImageFromFirebase(imageDownloadURL)}
+                    >
+                      <MdDelete className="-rotate-0" />
+                    </motion.button>
+                  </div>
+                </>
               )}
             </>
           )}
         </div>
+        <motion.button
+          {...ButtonClick}
+          className="w-full  py-2 bg-red-300 cursor-pointer rounded-md text-primary hover:bg-red-500"
+          onClick={submitNewData}
+        >
+          {" "}
+          Save
+        </motion.button>
       </div>
     </div>
   );

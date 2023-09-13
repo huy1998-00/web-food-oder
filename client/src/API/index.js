@@ -10,6 +10,30 @@ export const validateUserJWT = async (token) => {
     });
     return res.data.data;
   } catch (error) {
-    return null;
+    return error;
   }
 };
+// them san pham
+export const addNewProduct = async (data) => {
+  try {
+    const res = await axios.post(`${baseURL}/api/products/create`, { ...data });
+
+    return res.data.data;
+  } catch (error) {
+    return error;
+  }
+};
+// lấy tất cả sản phẩm
+
+export const getAllProduct = async () => {
+  try {
+    const res = await axios.get(`${baseURL}/api/products/all`);
+
+    return res.data.data;
+  } catch (error) {
+    return error;
+  }
+};
+/// delete produtch
+
+export const deleteAProduct = async () => {};
