@@ -5,11 +5,18 @@ import { HiCurrencyRupee } from "../assets/icons/index";
 import { alertSucess, alertNull } from "../context/actions/alertAcions";
 import { setAllProducts } from "../context/actions/productActions";
 import { getAllProduct, deleteAProduct } from "../API/index";
+import { useEffect } from "react";
 const DBItems = () => {
   const dispatch = useDispatch();
   // products data
-
   const products = useSelector((state) => state.products);
+
+  useEffect(() => {
+    getAllProduct().then((data) => {
+      console.log("fetch data at item");
+      dispatch(setAllProducts(data));
+    });
+  }, []);
 
   return (
     <div className=" flex items-center justify-self-center gap-4 pt-6 w-full">
@@ -45,7 +52,7 @@ const DBItems = () => {
             ),
           },
         ]}
-        data={products}
+        data={products || []}
         title="List of Products"
         // handle actions
         actions={[
@@ -53,7 +60,7 @@ const DBItems = () => {
             icon: "edit",
             tooltip: "Edit Data",
             onClick: (event, rowData) => {
-              alert("You want to edit " + rowData.productId);
+              alert("You want to edit " + rowData.product_id);
             },
           },
           {
@@ -63,11 +70,13 @@ const DBItems = () => {
               if (
                 window.confirm("Are you sure, you want to perform this aciton")
               ) {
-                deleteAProduct(rowData.productId).then((res) => {
+                // call API
+                deleteAProduct(rowData.product_id).then((res) => {
                   dispatch(alertSucess("Product Deleted "));
                   setInterval(() => {
                     dispatch(alertNull());
                   }, 3000);
+                  //update redux store
                   getAllProduct().then((data) => {
                     dispatch(setAllProducts(data));
                   });

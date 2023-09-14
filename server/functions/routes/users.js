@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const admin = require("firebase-admin");
+
 router.get("/", (req, res) => {
   return res.send("inside the user touter");
 });
@@ -30,6 +31,33 @@ router.get("/jwtVerification", async (req, res) => {
     res.status(500).send({
       succes: false,
       msg: error,
+    });
+  }
+});
+
+router.get("/all", async (req, res) => {
+  try {
+    admin
+      .auth()
+      .listUsers()
+      .then((listuserresult) => {
+        let data = [];
+        listuserresult.users.forEach((rec) => {
+          data.push(rec.toJSON());
+        });
+
+        return data;
+      })
+      .then((data) => {
+        return res
+          .status(200)
+          .send({ success: true, data: data, dataCount: data.length });
+      })
+      .catch((er) => console.log(er));
+  } catch (er) {
+    return res.send({
+      success: false,
+      msg: `Error in listing users :,${er}`,
     });
   }
 });

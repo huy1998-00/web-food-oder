@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const baseURL = "http://localhost:5001/foododer20/us-central1/app";
-
+//USer====================
 /// validate token function
 export const validateUserJWT = async (token) => {
   try {
@@ -13,6 +13,19 @@ export const validateUserJWT = async (token) => {
     return error;
   }
 };
+
+export const getAllUsers = async () => {
+  try {
+    const res = await axios.get(`${baseURL}/api/users/all`);
+    return res.data.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+//===============//========================
+
+//Product===========
 // them san pham
 export const addNewProduct = async (data) => {
   try {
@@ -34,6 +47,17 @@ export const getAllProduct = async () => {
     return error;
   }
 };
-/// delete produtch
+/// delete product
 
-export const deleteAProduct = async () => {};
+export const deleteAProduct = async (productId) => {
+  try {
+    const res = await axios.delete(
+      `${baseURL}/api/products/delete/${productId}`
+    );
+
+    return res.data.data;
+  } catch (error) {
+    return error;
+  }
+};
+//====================//=========================

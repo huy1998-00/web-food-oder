@@ -9,6 +9,7 @@ const DBHome = () => {
   useEffect(() => {
     if (!products) {
       getAllProduct().then((data) => {
+        console.log("fetch data");
         dispatch(setAllProducts(data));
       });
     }
