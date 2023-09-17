@@ -21,15 +21,19 @@ const Slider = () => {
     <div className="w-full pt-24">
       <Swiper
         slidesPerView={4}
-        centeredSlides={true}
+        centeredSlides={false}
         spaceBetween={30}
         grabCursor={true}
         className="mySwiper"
       >
         {fruits &&
           fruits.map((data, i) => (
-            <SwiperSlide key={i}>
-              <SliderCard key={i} data={data} index={i}></SliderCard>
+            <SwiperSlide>
+              <SliderCard
+                key={Math.random()}
+                data={data}
+                index={i}
+              ></SliderCard>
             </SwiperSlide>
           ))}
       </Swiper>

@@ -10,10 +10,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { app } from "../config/filebase.config";
 import { setUserNull } from "../context/actions/userActions";
+import { setCartOn } from "../context/actions/displayCartAction";
 const Header = () => {
   // lấy thông tin người dùng
   const user = useSelector((state) => state.user);
 
+  //in4 cart
+  const cart = useSelector((state) => state.cart);
   // state dropdownmenu
   const [isMenu, setIsMenu] = useState(false);
 
@@ -74,11 +77,19 @@ const Header = () => {
           </NavLink>
         </ul>
         {/* cart icon */}
-        <motion.div {...ButtonClick} className="relative cursor-pointer">
+        <motion.div
+          {...ButtonClick}
+          className="relative cursor-pointer"
+          onClick={() => dispatch(setCartOn())}
+        >
           <MdShoppingCart className="text-3xl text-textColor"></MdShoppingCart>
-          <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center absolute -top-4 -right-1">
-            <p className="text-primary text-base font-semibold">1</p>
-          </div>
+          {cart?.length > 0 && (
+            <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center absolute -top-4 -right-1">
+              <p className="text-primary text-base font-semibold">
+                {cart?.length}
+              </p>
+            </div>
+          )}
         </motion.div>
         {/* user manage */}
         {user ? (

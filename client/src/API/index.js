@@ -60,4 +60,42 @@ export const deleteAProduct = async (productId) => {
     return error;
   }
 };
+
+// add to cart
+export const addNewItemToCart = async (userId, data) => {
+  try {
+    const res = await axios.post(
+      `${baseURL}/api/products/addToCart/${userId}`,
+      { ...data }
+    );
+    return res.data.data;
+  } catch (error) {
+    return null;
+  }
+};
+// get all item in cart
+export const getAllCartItems = async (userId) => {
+  try {
+    const res = await axios.get(
+      `${baseURL}/api/products/getCartItems/${userId}`
+    );
+    return res.data.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+// update cart item
+export const updateCartItems = async (user_id, productId, type) => {
+  try {
+    const res = await axios.post(
+      `${baseURL}/api/products/updateCart/${user_id}`,
+      null,
+      { params: { productId: productId, type: type } }
+    );
+    return res.data.data;
+  } catch (error) {
+    return null;
+  }
+};
 //====================//=========================

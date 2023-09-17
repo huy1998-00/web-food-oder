@@ -3,9 +3,12 @@ import { Header, Home, HomeSlider, FilterSection } from "../components/index";
 import { useSelector, useDispatch } from "react-redux";
 import { setAllProducts } from "../context/actions/productActions";
 import { getAllProduct } from "../API/index";
-
+import { Cart } from "../components/index";
 const Main = () => {
   const products = useSelector((state) => state.products);
+
+  //cart state
+  const isCart = useSelector((state) => state.isCart);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!products) {
@@ -23,6 +26,8 @@ const Main = () => {
         <HomeSlider></HomeSlider>
         <FilterSection></FilterSection>
       </div>
+
+      {isCart && <Cart></Cart>}
     </main>
   );
 };

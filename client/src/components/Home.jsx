@@ -50,7 +50,7 @@ const Home = () => {
           {randomData &&
             randomData.map((data, i) => (
               <motion.div
-                key={i}
+                key={Math.random()}
                 {...staggerFadeInOut(i)}
                 className=" w-32 h-36 md:h-auto  md:w-190 p-4 bg-lightOverlay backdrop-blur-md rounded-3xl flex flex-col items-center justify-center drop-shadow-lg"
               >

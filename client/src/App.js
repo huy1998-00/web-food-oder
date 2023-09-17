@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import { Main, Login, DashBoard } from "./containers/index";
 import { app } from "./config/filebase.config";
 import { getAuth } from "firebase/auth";
-import { FaOptinMonster } from "react-icons/fa";
+
 import { useState } from "react";
 import { validateUserJWT } from "./API";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,8 @@ import { setUserDetail } from "./context/actions/userActions";
 import { motion } from "framer-motion";
 import { FadeInOut } from "./animations";
 import { Alert, MainLoader } from "./components/index";
+import { getAllCartItems } from "./API/index";
+import { setCartItems } from "./context/actions/cartAction";
 const App = () => {
   const firebaseAuth = getAuth(app);
   const [isLoadding, setIsLoadding] = useState(false);
@@ -27,6 +29,13 @@ const App = () => {
         cred.getIdToken().then((token) => {
           //lấy token người dùng gửi về backend qua API và nhận phản hồi
           validateUserJWT(token).then((data) => {
+            if (data) {
+              // get user's cart
+              getAllCartItems(data.user_id).then((items) => {
+                dispatch(setCartItems(items));
+              });
+            }
+
             // lưu trữ vào redux
             dispatch(setUserDetail(data));
           });
