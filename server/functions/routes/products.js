@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const admin = require("firebase-admin");
 const db = admin.firestore();
+const stripe = require("stripe")(process.env.STRIPE_KEY);
+const express = require("express");
+// const endpointSecret = process.env.WEBHOOK_SECRET;
 
 // create product
 router.post("/create", async (req, res) => {
@@ -183,5 +186,93 @@ router.get("/getCartItems/:userId", async (req, res) => {
     }
   })();
 });
+
+// create checkout session
+router.post("/create-checkout-session", async (req, res) => {
+  const shortCart = req.body.data.cart.map((item) => {
+    return {
+      quantity: item.quantity,
+
+      product_price: item.product_price,
+      product_name: item.product_name,
+    };
+  });
+
+  const customer = await stripe.customers.create({
+    metadata: {
+      user_id: req.body.data.user.user_id,
+      cart: JSON.stringify(shortCart),
+      total: req.body.data.total,
+    },
+  });
+
+  const line_items = req.body.data.cart.map((item) => {
+    return {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: item.product_name,
+          images: [item.imageURL],
+          metadata: {
+            id: item.productId,
+          },
+        },
+        unit_amount: item.product_price * 100,
+      },
+      quantity: item.quantity,
+    };
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    line_items,
+    customer: customer.id,
+    mode: "payment",
+    success_url: `${process.env.CLIENT_URL}/checkout-success`,
+    cancel_url: `${process.env.CLIENT_URL}/`,
+  });
+
+  res.send({ url: session.url });
+});
+
+let endpointSecret;
+// endpointSecret = process.env.WEBHOOK_SECRET;
+
+router.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    const sig = req.headers["stripe-signature"];
+
+    let eventType;
+    let data;
+
+    if (endpointSecret) {
+      let event;
+      try {
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      } catch (err) {
+        res.status(400).send(`Webhook Error: ${err.message}`);
+        return;
+      }
+      data = event.data.object;
+      eventType = event.type;
+    } else {
+      data = req.body.data.object;
+      eventType = req.body.type;
+    }
+
+    // Handle the event
+    if (eventType === "checkout.session.completed") {
+      stripe.customers.retrieve(data.customer).then((customer) => {
+        // console.log("Customer details", customer);
+        // console.log("Data", data);
+        // createOrder(customer, data, res);
+      });
+    }
+
+    // Return a 200 res to acknowledge receipt of the event
+    res.send().end();
+  }
+);
 
 module.exports = router;

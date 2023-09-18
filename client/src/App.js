@@ -14,6 +14,7 @@ import { FadeInOut } from "./animations";
 import { Alert, MainLoader } from "./components/index";
 import { getAllCartItems } from "./API/index";
 import { setCartItems } from "./context/actions/cartAction";
+import CheckoutSuccess from "./components/CheckoutSuccess";
 const App = () => {
   const firebaseAuth = getAuth(app);
   const [isLoadding, setIsLoadding] = useState(false);
@@ -65,6 +66,10 @@ const App = () => {
 
         {/* cần fix route này chỉ có admin có thể truy cập được */}
         <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
+        <Route
+          path="/checkout-success"
+          element={<CheckoutSuccess></CheckoutSuccess>}
+        ></Route>
       </Routes>
 
       {/* alert popup message */}

@@ -6,13 +6,14 @@ import { BiChevronsRight, FcClearFilters } from "../assets/icons/index";
 import { useSelector, useDispatch } from "react-redux";
 import { setCartOff } from "../context/actions/displayCartAction";
 import { HiCurrencyRupee } from "../assets/icons/index";
-import { getAllCartItems, updateCartItems } from "../API/index";
+import { baseURL, getAllCartItems, updateCartItems } from "../API/index";
 import { setCartItems } from "../context/actions/cartAction";
+import axios from "axios";
 
 const Cart = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
-
+  const user = useSelector((state) => state.user);
   const [total, setTotal] = useState(0);
 
   // total cart
@@ -27,7 +28,23 @@ const Cart = () => {
   }, [cart]);
 
   // function handle Checkout
-  const handleCheckOut = () => {};
+  const handleCheckOut = () => {
+    //get data
+    const data = {
+      user: user,
+      cart: cart,
+      total,
+    };
+    // call API
+    axios
+      .post(`${baseURL}/api/products/create-checkout-session`, { data })
+      .then((res) => {
+        if (res.data.url) {
+          window.location.href = res.data.url;
+        }
+      })
+      .catch();
+  };
   return (
     <motion.div
       {...slideIn}
