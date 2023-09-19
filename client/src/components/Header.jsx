@@ -131,7 +131,7 @@ const Header = () => {
                 </Link>
                 <Link
                   className="hover:text-red-400 text-xl text-textColor"
-                  to={"/order"}
+                  to={"/user-orders"}
                 >
                   Order
                 </Link>

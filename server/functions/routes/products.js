@@ -5,6 +5,7 @@ const stripe = require("stripe")(process.env.STRIPE_KEY);
 const express = require("express");
 // const endpointSecret = process.env.WEBHOOK_SECRET;
 
+// PRODUCT===================================================================================
 // create product
 router.post("/create", async (req, res) => {
   try {
@@ -58,6 +59,9 @@ router.delete("/delete/:productId", async (req, res) => {
   }
 });
 
+// PRODUCT===================================================================================
+
+//CART========================================================================================
 // add product to cart
 router.post("/addToCart/:userId", async (req, res) => {
   const userId = req.params.userId;
@@ -189,15 +193,16 @@ router.get("/getCartItems/:userId", async (req, res) => {
 
 // create checkout session
 router.post("/create-checkout-session", async (req, res) => {
+  //filter cart remove URL image
   const shortCart = req.body.data.cart.map((item) => {
     return {
       quantity: item.quantity,
-
+      productId: item.productId,
       product_price: item.product_price,
       product_name: item.product_name,
     };
   });
-
+  // custom customer
   const customer = await stripe.customers.create({
     metadata: {
       user_id: req.body.data.user.user_id,
@@ -224,6 +229,21 @@ router.post("/create-checkout-session", async (req, res) => {
   });
 
   const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    shipping_address_collection: { allowed_countries: ["VN"] },
+    shipping_options: [
+      {
+        shipping_rate_data: {
+          type: "fixed_amount",
+          fixed_amount: { amount: 0, currency: "usd" },
+          display_name: "Free shipping",
+          delivery_estimate: {
+            minimum: { unit: "hour", value: 2 },
+            maximum: { unit: "hour", value: 4 },
+          },
+        },
+      },
+    ],
     line_items,
     customer: customer.id,
     mode: "payment",
@@ -264,9 +284,11 @@ router.post(
     // Handle the event
     if (eventType === "checkout.session.completed") {
       stripe.customers.retrieve(data.customer).then((customer) => {
-        // console.log("Customer details", customer);
-        // console.log("Data", data);
-        // createOrder(customer, data, res);
+        console.log("Customer details", customer);
+        console.log("Data", data);
+
+        ///call helper function create Order
+        createOrder(customer, data, res);
       });
     }
 
@@ -274,5 +296,94 @@ router.post(
     res.send().end();
   }
 );
+
+//helper function crete order
+const createOrder = async (customer, intent, res) => {
+  console.log("Inside the orders");
+  try {
+    const orderId = Date.now();
+    const data = {
+      intentId: intent.id,
+      orderId: orderId,
+      amount: intent.amount_total,
+      created: intent.created,
+      payment_method_types: intent.payment_method_types,
+      status: intent.payment_status,
+      customer: intent.customer_details,
+      shipping_details: intent.shipping_details,
+      userId: customer.metadata.user_id,
+      items: JSON.parse(customer.metadata.cart),
+      total: customer.metadata.total,
+      sts: "preparing",
+    };
+    //create order
+    await db.collection("orders").doc(`/${orderId}/`).set(data);
+
+    //remove cart
+    deleteCart(customer.metadata.user_id, JSON.parse(customer.metadata.cart));
+    console.log("*****************************************");
+
+    return res.status(200).send({ success: true });
+  } catch (err) {
+    console.log(err);
+  }
+};
+// helper function delete
+const deleteCart = async (userId, items) => {
+  console.log("Inside the delete");
+
+  console.log(userId);
+
+  console.log("*****************************************");
+  items.map(async (data) => {
+    console.log("-------------------inside--------", userId, data.productId);
+    await db
+      .collection("cartItems")
+      .doc(`/${userId}/`)
+      .collection("items")
+      .doc(`/${data.productId}/`)
+      .delete()
+      .then(() => console.log("-------------------successs--------"));
+  });
+};
+
+//CART========================================================================================
+
+//ORDER========================================================================================
+
+router.get("/orders", async (req, res) => {
+  try {
+    let query = db.collection("orders");
+    let response = [];
+    await query.get().then((querysnap) => {
+      let docs = querysnap.docs;
+      docs.map((doc) => {
+        response.push({ ...doc.data() });
+      });
+      return response;
+    });
+    return res.status(200).send({ success: true, data: response });
+  } catch (err) {
+    return res.send({ success: false, msg: `Error :${err}` });
+  }
+});
+
+// update the order status
+router.post("/updateOrder/:order_id", async (req, res) => {
+  const order_id = req.params.order_id;
+  const sts = req.query.sts;
+
+  try {
+    const updatedItem = await db
+      .collection("orders")
+      .doc(`/${order_id}/`)
+      .update({ sts });
+    return res.status(200).send({ success: true, data: updatedItem });
+  } catch (er) {
+    return res.send({ success: false, msg: `Error :,${er}` });
+  }
+});
+
+//ORDER========================================================================================
 
 module.exports = router;

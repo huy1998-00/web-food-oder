@@ -15,6 +15,7 @@ import { Alert, MainLoader } from "./components/index";
 import { getAllCartItems } from "./API/index";
 import { setCartItems } from "./context/actions/cartAction";
 import CheckoutSuccess from "./components/CheckoutSuccess";
+import UserOrder from "./components/UserOrder";
 const App = () => {
   const firebaseAuth = getAuth(app);
   const [isLoadding, setIsLoadding] = useState(false);
@@ -70,6 +71,7 @@ const App = () => {
           path="/checkout-success"
           element={<CheckoutSuccess></CheckoutSuccess>}
         ></Route>
+        <Route path="user-orders" element={<UserOrder></UserOrder>}></Route>
       </Routes>
 
       {/* alert popup message */}
