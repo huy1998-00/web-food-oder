@@ -11,11 +11,12 @@ import "swiper/css/bundle";
 
 const Slider = () => {
   //get data
-  const products = useSelector((state) => state.products);
+  const products = useSelector((state) => state.products.products);
   const [fruits, setfruits] = useState(null);
-  useEffect(() => {
-    setfruits(products?.filter((data) => data.product_Category === "fruits"));
-  }, [products]);
+  // useEffect(() => {
+  //   // setfruits(products?.filter((data) => data.product_Category === "fruits"));
+  //   setfruits(products);
+  // }, [products]);
 
   return (
     <div className="w-full pt-24">

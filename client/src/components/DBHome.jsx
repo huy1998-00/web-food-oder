@@ -5,7 +5,7 @@ import { getAllProduct } from "../API/index";
 import { CChart } from "@coreui/react-chartjs";
 
 const DBHome = () => {
-  const products = useSelector((state) => state.products);
+  const products = useSelector((state) => state.products.products);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!products) {

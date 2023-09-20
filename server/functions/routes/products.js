@@ -15,7 +15,9 @@ router.post("/create", async (req, res) => {
       product_name: req.body.product_name,
       product_Category: req.body.product_Category,
       product_price: req.body.product_price,
+      product_description: req.body.product_description,
       imageURL: req.body.imageURL,
+      rating: [5],
     };
     const response = db.collection("products").doc(`/${id}/`).set(data);
     return res.status(200).send({ succes: true, data: response });

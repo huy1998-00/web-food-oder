@@ -5,9 +5,36 @@ import { staggerFadeInOut } from "../animations/index";
 import { IoFastFood } from "../assets/icons/index";
 import { statuses } from "../ultis/styles";
 import { SliderCard } from "../components/index";
+import { MdSearch } from "../assets/icons/index";
+import Select from "react-select";
+
+import { productListSelector } from "../context/selector/productSelector";
+import { filterByInput } from "../context/actions/productActions";
+
+const options = [
+  { value: "ascending", label: "Ascending" },
+  { value: "descending", label: "Descending" },
+];
+
 const FilterSection = () => {
   const [category, setcategory] = useState("fruits");
-  const products = useSelector((state) => state.products);
+  const products = useSelector(productListSelector);
+
+  //state input user searching
+  const [search, setsearch] = useState("");
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  // function handle user search product
+  const dispatch = useDispatch();
+  const handleUSerSearch = (e) => {
+    setsearch(e.target.value);
+    dispatch(filterByInput(e.target.value));
+  };
+  /// function handle category change
+  const handleCategoryChange = (category) => {
+    setcategory(category);
+  };
+
   return (
     //can fix to top rated dish
     <motion.div className="w-full flex items-start justify-start flex-col">
@@ -22,7 +49,7 @@ const FilterSection = () => {
         </div>
       </div>
       {/* product by category */}
-      {/* cần thên tính năng tìm kiếm theo tên ở đây */}
+
       <div className="w-full overflow-x-scroll pt-6 flex items-center justify-center gap-6 py-8 ">
         {/* category section */}
         {statuses &&
@@ -30,25 +57,39 @@ const FilterSection = () => {
             <FilterCard
               data={data}
               category={category}
-              setCategory={setcategory}
+              setCategory={handleCategoryChange}
               index={Math.random()}
               key={i}
             />
           ))}
       </div>
 
+      <div className="w-full  pt-2 flex items-center justify-center gap-6 py-8 ">
+        {/* seaching and filter  section */}
+        {/* cần thên tính năng tìm kiếm theo tên ở đây */}
+        <div className=" flex items-center justify-center gap-3 px-4 py-2 bg-lightOverlay backdrop-blur-md rounded-md shadow-md">
+          <MdSearch className="text-gray-400 text-2xl" />
+          <input
+            type="text"
+            placeholder="Search Here..."
+            className="border-none outline-none bg-transparent w-32 text-base font-semibold text-textColor"
+            value={search}
+            onChange={handleUSerSearch}
+          />
+        </div>
+        <Select
+          defaultValue={selectedOption}
+          onChange={setSelectedOption}
+          options={options}
+        />
+      </div>
+
       {/* product */}
       <div className=" w-full flex items-center justify-evenly flex-wrap gap-4 mt-12 ">
         {products &&
-          products
-            .filter((data) => data.product_Category === category)
-            .map((data, i) => (
-              <SliderCard
-                key={Math.random()}
-                data={data}
-                index={Math.random()}
-              />
-            ))}
+          products.map((data, i) => (
+            <SliderCard key={Math.random()} data={data} index={Math.random()} />
+          ))}
       </div>
     </motion.div>
   );

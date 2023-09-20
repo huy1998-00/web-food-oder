@@ -24,6 +24,7 @@ import { setAllProducts } from "../context/actions/productActions";
 const DBNewItem = () => {
   const [itemName, setItemName] = useState("");
   const [price, setPrice] = useState("");
+  const [description, setdescription] = useState("");
   const [category, setcategory] = useState(null);
   const [isLoadding, setIsLoadding] = useState(false);
   const [imageDownloadURL, setImageDownloadURL] = useState(null);
@@ -106,6 +107,7 @@ const DBNewItem = () => {
       product_name: itemName,
       product_Category: category,
       product_price: price,
+      product_description: description,
       imageURL: imageDownloadURL,
     };
     // call API
@@ -116,6 +118,7 @@ const DBNewItem = () => {
         setItemName("");
         setImageDownloadURL("");
         setPrice("");
+        setdescription("");
         setcategory(null);
         dispatch(alertSucess("Succes add product"));
         // update redux
@@ -141,6 +144,18 @@ const DBNewItem = () => {
           stateValue={itemName}
           stateFunction={setItemName}
         ></InputValueField>
+        <InputValueField
+          type={"number"}
+          placeHolder={"Price here...."}
+          stateValue={price}
+          stateFunction={setPrice}
+        ></InputValueField>
+        <InputValueField
+          type={"text"}
+          placeHolder={"Description here...."}
+          stateValue={description}
+          stateFunction={setdescription}
+        ></InputValueField>
 
         {/* category section */}
         <div className="w-full flex items-center justify-around gap-3 flex-wrap">
@@ -162,13 +177,8 @@ const DBNewItem = () => {
               );
             })}
         </div>
-        <InputValueField
-          type={"number"}
-          placeHolder={"Price here...."}
-          stateValue={price}
-          stateFunction={setPrice}
-        ></InputValueField>
-        <div className="w-full bg-card backdrop-blur-md h-370 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
+
+        <div className="w-full bg-card backdrop-blur-md h-300 rounded-md border-2 border-dotted border-gray-300 cursor-pointer">
           {/* Upload image section */}
           {isLoadding ? (
             <div className="h-full w-full flex flex-col items-center justify-evenly px-24">

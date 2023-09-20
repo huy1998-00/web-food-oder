@@ -66,12 +66,12 @@ const App = () => {
         <Route path="/login" element={<Login></Login>}></Route>
 
         {/* cần fix route này chỉ có admin có thể truy cập được */}
-        <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
+        {/* <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
         <Route
           path="/checkout-success"
           element={<CheckoutSuccess></CheckoutSuccess>}
         ></Route>
-        <Route path="user-orders" element={<UserOrder></UserOrder>}></Route>
+        <Route path="user-orders" element={<UserOrder></UserOrder>}></Route> */}
       </Routes>
 
       {/* alert popup message */}

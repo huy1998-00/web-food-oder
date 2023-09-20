@@ -9,7 +9,7 @@ import { useEffect } from "react";
 const DBItems = () => {
   const dispatch = useDispatch();
   // products data
-  const products = useSelector((state) => state.products);
+  const products = useSelector((state) => state.products.products);
 
   useEffect(() => {
     getAllProduct().then((data) => {
