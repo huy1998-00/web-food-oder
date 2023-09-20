@@ -1,9 +1,8 @@
-import { all } from "axios";
-
 const initialProduct = {
   filter: {
     search: "",
-    category: all,
+    category: "all",
+    sort: "",
   },
   products: [],
 };
@@ -24,8 +23,14 @@ const productReducer = (state = initialProduct, action) => {
         products: action.payload,
       };
 
-    case "SORT_BY_PRICE":
-      return state;
+    case "SORT_BY":
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          sort: action.payload,
+        },
+      };
 
     case "FILTER_BY_INPUT":
       return {
@@ -33,6 +38,14 @@ const productReducer = (state = initialProduct, action) => {
         filter: {
           ...state.filter,
           search: action.payload,
+        },
+      };
+    case "FILTER_BY_CATEGORY":
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          category: action.payload,
         },
       };
 

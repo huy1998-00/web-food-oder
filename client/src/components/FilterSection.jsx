@@ -8,21 +8,25 @@ import { SliderCard } from "../components/index";
 import { MdSearch } from "../assets/icons/index";
 import Select from "react-select";
 
-import { productListSelector } from "../context/selector/productSelector";
-import { filterByInput } from "../context/actions/productActions";
+import { listProduct } from "../context/selector/productSelector";
+import {
+  filterByInput,
+  filterByCategory,
+  sortProducts,
+} from "../context/actions/productActions";
 
 const options = [
-  { value: "ascending", label: "Ascending" },
-  { value: "descending", label: "Descending" },
+  { value: "ascending", label: "Price Low to High" },
+  { value: "descending", label: "Price High to Low" },
 ];
 
 const FilterSection = () => {
-  const [category, setcategory] = useState("fruits");
-  const products = useSelector(productListSelector);
+  const products = useSelector(listProduct);
 
   //state input user searching
   const [search, setsearch] = useState("");
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [category, setcategory] = useState("all");
+  const [sortOption, setsortOption] = useState("");
 
   // function handle user search product
   const dispatch = useDispatch();
@@ -33,8 +37,13 @@ const FilterSection = () => {
   /// function handle category change
   const handleCategoryChange = (category) => {
     setcategory(category);
+    dispatch(filterByCategory(category));
   };
-
+  // function handle sort order change
+  const handleSortOrderChange = (e) => {
+    setsortOption(e.value);
+    dispatch(sortProducts(e.value));
+  };
   return (
     //can fix to top rated dish
     <motion.div className="w-full flex items-start justify-start flex-col">
@@ -78,18 +87,21 @@ const FilterSection = () => {
           />
         </div>
         <Select
-          defaultValue={selectedOption}
-          onChange={setSelectedOption}
+          defaultValue={"Select.."}
+          onChange={handleSortOrderChange}
           options={options}
         />
       </div>
 
       {/* product */}
       <div className=" w-full flex items-center justify-evenly flex-wrap gap-4 mt-12 ">
-        {products &&
+        {products.length > 0 ? (
           products.map((data, i) => (
             <SliderCard key={Math.random()} data={data} index={Math.random()} />
-          ))}
+          ))
+        ) : (
+          <h1>No Product</h1>
+        )}
       </div>
     </motion.div>
   );

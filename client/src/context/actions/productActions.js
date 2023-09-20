@@ -34,7 +34,14 @@ export const filterByInput = (text) => {
 
 export const filterByCategory = (category) => {
   return {
-    type: "FILTER_BY_INPUT",
+    type: "FILTER_BY_CATEGORY",
     payload: category,
+  };
+};
+
+export const sortProducts = (sort) => {
+  return {
+    type: "SORT_BY",
+    payload: sort,
   };
 };

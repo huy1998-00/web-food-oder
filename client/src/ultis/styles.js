@@ -7,6 +7,8 @@ export const isNotActiveStyles =
 
 //category data
 export const statuses = [
+  { id: 0, title: "All", category: "all" },
+
   { id: 1, title: "Drinks", category: "drinks" },
   { id: 2, title: "Deserts", category: "deserts" },
   { id: 3, title: "Fruits", category: "fruits" },
