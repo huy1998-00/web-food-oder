@@ -52,3 +52,21 @@ export const randomData = [
     product_price: "22.0",
   },
 ];
+
+export const productDetailinfor = {
+  id: 1,
+  imageURL:
+    "https://firebasestorage.googleapis.com/v0/b/food-app-nov-22.appspot.com/o/Pictures%2F1674704862591_dessert2.png?alt=media&token=7c001521-f0ac-40a8-b07a-42dc4aab444a",
+  product_name: "Iceream Chocolate & vanilla",
+  product_category: "icecream",
+  product_price: "23.00",
+  rating: [5],
+  product_description: "Chocolate ice Cream",
+};
+
+export const feedbackData = [
+  { product_id: "", rating: 2, message: "bad product" },
+  { product_id: "", rating: 3, message: "bad product" },
+  { product_id: "", rating: 4, message: "bad product" },
+  { product_id: "", rating: 5, message: "bad product" },
+];

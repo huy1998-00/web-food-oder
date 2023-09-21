@@ -25,3 +25,4 @@ export { default as Cart } from "./Cart";
 export { default as OrderData } from "./OrderData";
 
 export { default as UserOrder } from "./UserOrder";
+export { default as FeedBack } from "./FeedBack";

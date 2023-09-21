@@ -16,6 +16,7 @@ import { getAllCartItems } from "./API/index";
 import { setCartItems } from "./context/actions/cartAction";
 import CheckoutSuccess from "./components/CheckoutSuccess";
 import UserOrder from "./components/UserOrder";
+import ProductDetail from "./containers/ProductDetail";
 const App = () => {
   const firebaseAuth = getAuth(app);
   const [isLoadding, setIsLoadding] = useState(false);
@@ -66,12 +67,16 @@ const App = () => {
         <Route path="/login" element={<Login></Login>}></Route>
 
         {/* cần fix route này chỉ có admin có thể truy cập được */}
-        {/* <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
+        <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
         <Route
           path="/checkout-success"
           element={<CheckoutSuccess></CheckoutSuccess>}
         ></Route>
-        <Route path="user-orders" element={<UserOrder></UserOrder>}></Route> */}
+        <Route path="/user-orders" element={<UserOrder></UserOrder>}></Route>
+        <Route
+          path="/productdetail"
+          element={<ProductDetail></ProductDetail>}
+        ></Route>
       </Routes>
 
       {/* alert popup message */}
