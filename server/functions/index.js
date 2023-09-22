@@ -44,6 +44,11 @@ const productsRoute = require("./routes/products");
 
 app.use("/api/products", productsRoute);
 
+//feedback route
+const feedbackRoute = require("./routes/feedback");
+
+app.use("/api/feedback", feedbackRoute);
+
 ///==============================
 
 exports.app = functions.https.onRequest(app);

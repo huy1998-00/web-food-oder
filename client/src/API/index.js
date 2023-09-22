@@ -61,6 +61,18 @@ export const deleteAProduct = async (productId) => {
   }
 };
 
+export const getProductById = async (id) => {
+  try {
+    const res = await axios.get(`${baseURL}/api/products/detail/${id}`);
+
+    return res.data.data;
+  } catch (error) {
+    return error;
+  }
+};
+
+//get product by id
+
 ///===========Cart
 
 // add to cart
@@ -128,3 +140,24 @@ export const updateOrderSts = async (order_id, sts) => {
 };
 
 //==================Order=================
+
+///====================Feedback==============
+export const sendFeedback = async (data) => {
+  try {
+    const res = await axios.post(`${baseURL}/api/feedback/create`, { ...data });
+
+    return res.data.data;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const getFeedbackById = async (id) => {
+  try {
+    const res = await axios.get(`${baseURL}/api/feedback/get/${id}`, null, {});
+
+    return res.data.data;
+  } catch (error) {}
+};
+
+///====================Feedback==============

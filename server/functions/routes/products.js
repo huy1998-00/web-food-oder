@@ -61,6 +61,21 @@ router.delete("/delete/:productId", async (req, res) => {
   }
 });
 
+//get product by ID
+router.get("/detail/:id", async (req, res) => {
+  const productId = req.params.id;
+  try {
+    const response = await db
+      .collection("products")
+      .doc(`/${productId}/`)
+      .get();
+
+    return res.status(200).send({ success: true, data: response.data() });
+  } catch (error) {
+    return res.send({ success: false, msg: `Error :${error}` });
+  }
+});
+
 // PRODUCT===================================================================================
 
 //CART========================================================================================

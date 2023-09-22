@@ -1,6 +1,6 @@
 import React from "react";
 import { ButtonClick } from "../animations";
-
+import { Link } from "react-router-dom";
 import { HiCurrencyRupee, IoBasket } from "../assets/icons";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,7 +31,10 @@ const SliderCard = ({ data, index }) => {
 
   return (
     <div className="bg-lightOverlay hover:drop-shadow-lg backdrop-blur-md rounded-xl flex items-center justify-between relative px-4 py-2 w-full md:w-340 md:min-w-350 gap-3">
-      <img src={data.imageURL} className="w-40 h-40 object-contain" alt="" />
+      <Link to={`/productdetail/${data.product_id}`}>
+        <img src={data.imageURL} className="w-40 h-40 object-contain" alt="" />
+      </Link>
+
       <div className="relative pt-12">
         <p className="text-xl text-headingColor font-semibold">
           {data.product_name}

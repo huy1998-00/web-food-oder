@@ -9,8 +9,8 @@ const FeedBack = ({ data }) => {
         <img src={Avatar2} className="h-12 w-12" alt="" />
       </div>
       <div>
-        <Rating value={data.rating} readOnly></Rating>
-        <p>{data.message}</p>
+        <Rating value={data.data.rating} readOnly></Rating>
+        <p>{data.data.message}</p>
       </div>
     </motion.div>
   );

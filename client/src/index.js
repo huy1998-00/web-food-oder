@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import { createStore } from "redux";
 import { Provider } from "react-redux";
 import myReducer from "./context/reducers";
+import ScrollToTop from "./ultis/styles";
 
 const myStore = createStore(
   myReducer,
@@ -19,6 +20,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Router>
+      <ScrollToTop></ScrollToTop>
       <AnimatePresence>
         <Provider store={myStore}>
           <App></App>

@@ -1,3 +1,16 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+export default function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 // active style
 export const isActiveStyles =
   " text-2xl text-red-700 font-semibold hover:text-red-700 px-4 py-2 duration-100 transition-all ease-in-out";
@@ -70,3 +83,18 @@ export const feedbackData = [
   { product_id: "", rating: 4, message: "bad product" },
   { product_id: "", rating: 5, message: "bad product" },
 ];
+
+export const average = (numbers) => {
+  // Calculate the sum of the numbers in the array
+  let sum = numbers?.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue;
+  }, 0);
+
+  // Divide the sum by the total number of elements in the array
+  let avg = sum / numbers?.length;
+
+  // Return the average
+  console.log(numbers);
+  console.log(avg);
+  return avg.toFixed(2);
+};
