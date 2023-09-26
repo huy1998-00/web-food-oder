@@ -22,7 +22,7 @@ const Cart = () => {
     if (cart) {
       cart.map((data) => {
         tot = tot + data.product_price * data.quantity;
-        setTotal(tot);
+        return setTotal(tot);
       });
     }
   }, [cart]);
@@ -111,7 +111,7 @@ export const CartItemCard = ({ index, data }) => {
   // tính số tiền của từng món
   useEffect(() => {
     setItemTotal(data?.product_price * data?.quantity);
-  }, [itemTotal, cart]);
+  }, [itemTotal, cart, data]);
 
   //function handle increasement item in cart
   const incrementCart = (productId) => {
@@ -136,12 +136,12 @@ export const CartItemCard = ({ index, data }) => {
     <motion.div
       key={index}
       {...staggerFadeInOut(index)}
-      className="w-full flex items-center justify-start bg-zinc-800 rounded-md drop-shadow-md px-4 gap-4"
+      className="w-full flex items-center justify-start bg-zinc-800 rounded-md drop-shadow-md px-4 gap-4 max-md:py-8"
     >
       {/* image */}
       <img
         src={data?.imageURL}
-        className=" w-24 min-w-[94px] h-24 object-contain"
+        className=" w-24 min-w-[94px] h-24 object-contain  max-md:hidden"
         alt=""
       />
       {/* text */}

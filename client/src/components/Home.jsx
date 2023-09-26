@@ -46,14 +46,17 @@ const Home = () => {
           alt=""
         />
         {/* cần fix chõ này thành 4 item must try ( highest rating)*/}
-        <div className="w-full md:w-460 ml-0 flex flex-wrap items-center justify-center gap-4 gap-y-14">
+        <div className="w-full md:w-460 ml-0 flex flex-wrap items-center justify-center gap-12 gap-y-14">
           {randomData &&
             randomData.map((data, i) => (
               <motion.div
-                key={Math.random()}
+                key={i}
                 {...staggerFadeInOut(i)}
                 className=" w-32 h-36 md:h-auto  md:w-190 p-4 bg-lightOverlay backdrop-blur-md rounded-3xl flex flex-col items-center justify-center drop-shadow-lg"
               >
+                <p className="neontext absolute z-50 top-5 left-[-30px] lg:text-xs text-[10px] lg:font-semibold">
+                  must try
+                </p>
                 <img
                   src={data.imageURL}
                   className="w-12 h-12 md:w-32 md:h-32 md:-mt-16 object-contain "

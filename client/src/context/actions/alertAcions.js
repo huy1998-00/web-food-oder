@@ -20,7 +20,7 @@ export const alertInfor = (message) => {
   return {
     type: "SET_INFO",
     alert: {
-      type: "info ",
+      type: "info",
       message: message,
     },
   };

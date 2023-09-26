@@ -26,7 +26,6 @@ const FilterSection = () => {
   //state input user searching
   const [search, setsearch] = useState("");
   const [category, setcategory] = useState("all");
-  const [sortOption, setsortOption] = useState("");
 
   // function handle user search product
   const dispatch = useDispatch();
@@ -41,7 +40,6 @@ const FilterSection = () => {
   };
   // function handle sort order change
   const handleSortOrderChange = (e) => {
-    setsortOption(e.value);
     dispatch(sortProducts(e.value));
   };
   return (
@@ -51,7 +49,7 @@ const FilterSection = () => {
         <div className=" w-full flex items-center justify-between ">
           <div className="flex flex-col items-start justify-start gap-1">
             <p className="text-2xl text-headingColor font-bold">
-              Our Fresh & Healthy Fruits
+              Our Fresh & Healthy Foods
             </p>
             <div className="w-40 h-1 rounded-md bg-orange-500"></div>
           </div>
@@ -59,7 +57,7 @@ const FilterSection = () => {
       </div>
       {/* product by category */}
 
-      <div className="w-full overflow-x-scroll pt-6 flex items-center justify-center gap-6 py-8 ">
+      <div className="w-full overflow-x-scroll pt-6 flex items-center justify-between gap-6 py-8 ">
         {/* category section */}
         {statuses &&
           statuses.map((data, i) => (

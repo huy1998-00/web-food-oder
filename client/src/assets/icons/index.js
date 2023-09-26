@@ -6,7 +6,13 @@ import {
   FaArrowLeft,
 } from "react-icons/fa";
 import { FcGoogle, FcClearFilters } from "react-icons/fc";
-import { MdShoppingCart, MdLogout, MdSearch, MdDelete } from "react-icons/md";
+import {
+  MdShoppingCart,
+  MdLogout,
+  MdSearch,
+  MdDelete,
+  MdStarRate,
+} from "react-icons/md";
 import {
   BsToggles2,
   BsFillBellFill,
@@ -35,4 +41,5 @@ export {
   FcClearFilters,
   FaArrowLeft,
   HiCurrencyRupee,
+  MdStarRate,
 };

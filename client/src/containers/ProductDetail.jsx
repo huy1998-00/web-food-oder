@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Header, Cart, FeedBack } from "../components/index";
-import { useSelector } from "react-redux";
-import { productDetailinfor } from "../ultis/styles";
+import { useSelector, useDispatch } from "react-redux";
+import { addNewItemToCart, getAllCartItems } from "../API/index";
 import { HiCurrencyRupee } from "../assets/icons/index";
 import { motion } from "framer-motion";
 import { ButtonClick, slideTop } from "../animations/index";
@@ -10,7 +10,8 @@ import Rating from "@mui/material/Rating";
 import Modal from "@mui/material/Modal";
 import { average } from "../ultis/styles";
 import { getProductById, sendFeedback, getFeedbackById } from "../API";
-
+import { setCartItems } from "../context/actions/cartAction";
+import { alertSucess, alertNull } from "../context/actions/alertAcions";
 const ProductDetail = () => {
   const { id } = useParams();
 
@@ -18,6 +19,9 @@ const ProductDetail = () => {
   const [detail, setdetail] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const isCart = useSelector((state) => state.isCart);
+
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   //star state
   const [star, setstar] = useState(null);
@@ -33,9 +37,24 @@ const ProductDetail = () => {
     console.log(newValue);
     setopen(true);
   };
-  function refreshPage() {
-    window.location.reload(false);
-  }
+
+  //function handle send item to cart
+  const sendToCart = () => {
+    const data = { ...detail };
+
+    //call APi
+    addNewItemToCart(user?.user_id, data).then((res) => {
+      getAllCartItems(user?.user_id).then((items) => {
+        //update cart in redux
+        dispatch(setCartItems(items));
+      });
+      // popup message
+      dispatch(alertSucess("Item added to cart"));
+      setInterval(() => {
+        dispatch(alertNull());
+      }, 3000);
+    });
+  };
 
   //function handle send feedback
   const handleSendFeedback = async () => {
@@ -46,10 +65,11 @@ const ProductDetail = () => {
     };
 
     sendFeedback(data).then((res) => {
-      console.log(res);
+      setFeedback([{ data: data }, ...feedback]);
     });
 
     setopen(false);
+    setMessage("");
   };
 
   // fetchdata
@@ -109,8 +129,9 @@ const ProductDetail = () => {
             </div>
             <div>
               <motion.button
+                onClick={sendToCart}
                 {...ButtonClick}
-                className="bg-gradient-to-bl from-orange-400 to-orange-600 px-4 py-2 rounded-xl text-black text-base font-semibold"
+                className="bg-gradient-to-bl from-orange-400 to-orange-600 px-4 py-2 rounded-xl text-black text-base font-semibold shadow-md"
               >
                 ADD TO CART
               </motion.button>
@@ -147,7 +168,7 @@ const ProductDetail = () => {
       >
         <motion.div
           {...slideTop}
-          className=" w-300 md:w-508 bg-slate-100 backdrop-blur-lg shadow-md h-300 z-50 flex items-center justify-start flex-col"
+          className=" w-300 md:w-508 bg-slate-100 backdrop-blur-lg shadow-md h-300 z-50 flex items-center justify-start flex-col rounded-md"
         >
           <h1 className="text-3xl text-headingColor font-semibold my-4">
             Thank you for sent us feedback :D{" "}
@@ -157,7 +178,7 @@ const ProductDetail = () => {
             id=""
             cols="30"
             rows="10"
-            className="w-full h-40"
+            className="w-10/12 h-40 rounded-md shadow-md"
             placeholder="More detail here...."
             value={message}
             onChange={(e) => setMessage(e.target.value)}

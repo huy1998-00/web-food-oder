@@ -93,8 +93,5 @@ export const average = (numbers) => {
   // Divide the sum by the total number of elements in the array
   let avg = sum / numbers?.length;
 
-  // Return the average
-  console.log(numbers);
-  console.log(avg);
   return avg.toFixed(2);
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { LoginBg, Logo } from "../assets/index";
 import { LoginInput } from "../components";
 import { useState } from "react";
@@ -17,11 +17,15 @@ import { app } from "../config/filebase.config";
 import { validateUserJWT } from "../API";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetail } from "../context/actions/userActions";
-import { alertInfor, alertWarning } from "../context/actions/alertAcions";
+import {
+  alertInfor,
+  alertWarning,
+  alertNull,
+} from "../context/actions/alertAcions";
 const Login = () => {
-  const [userEmail, setUserEmail] = useState("");
-  const [userPassword, setUserPassword] = useState("");
-  const [confirm_Password, setConfirm_Password] = useState("");
+  const userEmail = useRef();
+  const userPassword = useRef();
+  const confirm_Password = useRef();
   const [isSignUp, setIsSignUp] = useState(false);
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
@@ -62,51 +66,68 @@ const Login = () => {
   // func handle sginup với emaill and password
 
   const signUpWithEmailPass = async () => {
-    if (userEmail === "" || userPassword === "" || confirm_Password === "") {
+    if (
+      userEmail.current.value === "" ||
+      userPassword.current.value === "" ||
+      confirm_Password.current.value === ""
+    ) {
       dispatch(alertWarning("Required field should not emty"));
+      setTimeout(() => {
+        dispatch(alertNull());
+      }, 3000);
       //xuw ly bo trong
     } else {
-      if (userPassword === confirm_Password) {
-        setUserEmail("");
-        setUserPassword("");
-        setConfirm_Password("");
+      if (userPassword.current.value === confirm_Password.current.value) {
+        // setUserEmail("");
+        // setUserPassword("");
+        // setConfirm_Password("");
 
         await createUserWithEmailAndPassword(
           firebaseAuth,
-          userEmail,
-          userPassword
-        ).then((Usercred) => {
-          firebaseAuth.onAuthStateChanged((cred) => {
-            if (cred) {
-              cred.getIdToken().then((token) => {
-                //lấy token người dùng gửi về backend qua API và nhận phản hồi
-                validateUserJWT(token).then((data) => {
-                  setUserEmail("");
-                  setUserPassword("");
-                  setConfirm_Password("");
-                  setIsSignUp(false);
-                  // lưu vào redux
-                  dispatch(setUserDetail(data));
+          userEmail.current.value,
+          userPassword.current.value
+        )
+          .then((Usercred) => {
+            firebaseAuth.onAuthStateChanged((cred) => {
+              if (cred) {
+                cred.getIdToken().then((token) => {
+                  //lấy token người dùng gửi về backend qua API và nhận phản hồi
+                  validateUserJWT(token).then((data) => {
+                    // setUserEmail("");
+                    // setUserPassword("");
+                    // setConfirm_Password("");
+                    setIsSignUp(false);
+                    // lưu vào redux
+                    dispatch(setUserDetail(data));
+                  });
+                  /// cần xử lý popup message phản hổi từ backend (nêu tạo thành công hoac thất bại)
                 });
-                /// cần xử lý popup message phản hổi từ backend (nêu tạo thành công hoac thất bại)
-              });
-            } else {
-              //alert message nếu password và confirm not match
-              dispatch(alertWarning("Confirm password not match"));
-            }
+              }
+            });
+          })
+          .catch((err) => {
+            dispatch(alertInfor(err.message.split("(")[1].replace(")", "")));
+            setTimeout(() => {
+              dispatch(alertNull());
+            }, 3000);
           });
-        });
+      } else {
+        //alert message nếu password và confirm not match
+        dispatch(alertWarning("Confirm password not match"));
+        setTimeout(() => {
+          dispatch(alertNull());
+        }, 3000);
       }
     }
   };
   /// func login with email and passs
 
   const signInWithEmailPass = async () => {
-    if (userEmail !== "" || userPassword !== "") {
+    if (userEmail.current.value !== "" || userPassword.current.value !== "") {
       await signInWithEmailAndPassword(
         firebaseAuth,
-        userEmail,
-        userPassword
+        userEmail.current.value,
+        userPassword.current.value
       ).then((userCred) => {
         firebaseAuth.onAuthStateChanged((cred) => {
           if (cred) {
@@ -157,16 +178,14 @@ const Login = () => {
           <LoginInput
             placeholder={"Email here"}
             icon={<FaEnvelope className="text-xl text-textColor"></FaEnvelope>}
-            inputState={userEmail}
-            inputStateFunc={setUserEmail}
+            inputRef={userEmail}
             isSignup={isSignUp}
             type={"email"}
           ></LoginInput>
           <LoginInput
             placeholder={"Password here"}
             icon={<FaLock className="text-xl text-textColor"></FaLock>}
-            inputState={userPassword}
-            inputStateFunc={setUserPassword}
+            inputRef={userPassword}
             isSignup={isSignUp}
             type={"password"}
           ></LoginInput>
@@ -174,8 +193,7 @@ const Login = () => {
             <LoginInput
               placeholder={"Confirm password here"}
               icon={<FaLock className="text-xl text-textColor"></FaLock>}
-              inputState={confirm_Password}
-              inputStateFunc={setConfirm_Password}
+              inputRef={confirm_Password}
               isSignup={isSignUp}
               type={"password"}
             ></LoginInput>

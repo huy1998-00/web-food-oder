@@ -2,14 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FadeInOut } from "../animations";
-const LoginInput = ({
-  placeholder,
-  type,
-  isSignup,
-  inputState,
-  inputStateFunc,
-  icon,
-}) => {
+const LoginInput = ({ placeholder, type, isSignup, inputRef, icon }) => {
   const [isForcus, setIsForcus] = useState(false);
 
   return (
@@ -24,10 +17,7 @@ const LoginInput = ({
         placeholder={placeholder}
         type={type}
         className={`w-full h-full bg-transparent text-headingColor text-lg font-semibold border-none outline-none `}
-        value={inputState}
-        onChange={(e) => {
-          inputStateFunc(e.target.value);
-        }}
+        ref={inputRef}
         // {khi forcus}
         onFocus={() => {
           setIsForcus(true);
