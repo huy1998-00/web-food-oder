@@ -36,6 +36,17 @@ export const addNewProduct = async (data) => {
     return error;
   }
 };
+
+// edit
+export const editAProduct = async (data) => {
+  try {
+    const res = await axios.post(`${baseURL}/api/products/update`, { ...data });
+
+    return res.data.data;
+  } catch (error) {
+    return error;
+  }
+};
 // lấy tất cả sản phẩm
 
 export const getAllProduct = async () => {
@@ -61,6 +72,7 @@ export const deleteAProduct = async (productId) => {
   }
 };
 
+//get product by id
 export const getProductById = async (id) => {
   try {
     const res = await axios.get(`${baseURL}/api/products/detail/${id}`);
@@ -71,7 +83,7 @@ export const getProductById = async (id) => {
   }
 };
 
-//get product by id
+//update product by id
 
 ///===========Cart
 

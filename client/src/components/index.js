@@ -26,3 +26,5 @@ export { default as OrderData } from "./OrderData";
 
 export { default as UserOrder } from "./UserOrder";
 export { default as FeedBack } from "./FeedBack";
+
+export { default as DBEditProduct } from "./DBEditProduct";

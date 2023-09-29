@@ -25,6 +25,26 @@ router.post("/create", async (req, res) => {
     return res.status(500).send({ succes: false, msg: error });
   }
 });
+//update product
+router.post("/update", async (req, res) => {
+  try {
+    const id = req.body.product_id;
+    const updateData = {
+      product_name: req.body.product_name,
+      product_Category: req.body.product_Category,
+      product_price: req.body.product_price,
+      product_description: req.body.product_description,
+      imageURL: req.body.imageURL,
+    };
+    const response = db
+      .collection("products")
+      .doc(`/${id}/`)
+      .update(updateData);
+    return res.status(200).send({ succes: true, data: response });
+  } catch (error) {
+    return res.status(500).send({ succes: false, msg: error });
+  }
+});
 
 // get all products
 router.get("/all", async (req, res) => {

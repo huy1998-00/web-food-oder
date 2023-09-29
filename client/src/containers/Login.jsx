@@ -35,8 +35,6 @@ const Login = () => {
   //lấy dữ liệu người dùng hiện tại
   const user = useSelector((state) => state.user);
 
-  // alert message
-  const alert = useSelector((state) => state.alert);
   // handle trương hợp người dùng đã đăng nhập
   useEffect(() => {
     if (user) {
@@ -93,9 +91,11 @@ const Login = () => {
                 cred.getIdToken().then((token) => {
                   //lấy token người dùng gửi về backend qua API và nhận phản hồi
                   validateUserJWT(token).then((data) => {
-                    // setUserEmail("");
-                    // setUserPassword("");
-                    // setConfirm_Password("");
+                    userEmail.current.value = "";
+                    userPassword.current.value = "";
+
+                    confirm_Password.current.value = "";
+
                     setIsSignUp(false);
                     // lưu vào redux
                     dispatch(setUserDetail(data));
@@ -128,25 +128,29 @@ const Login = () => {
         firebaseAuth,
         userEmail.current.value,
         userPassword.current.value
-      ).then((userCred) => {
-        firebaseAuth.onAuthStateChanged((cred) => {
-          if (cred) {
-            cred.getIdToken().then((token) => {
-              //lấy token người dùng gửi về backend qua API và nhận phản hồi
-              validateUserJWT(token).then((data) => {
-                //nếu thành công, => popup pản hồi
-                // lưu vào redux
-                dispatch(setUserDetail(data));
+      )
+        .then((userCred) => {
+          firebaseAuth.onAuthStateChanged((cred) => {
+            if (cred) {
+              cred.getIdToken().then((token) => {
+                //lấy token người dùng gửi về backend qua API và nhận phản hồi
+                validateUserJWT(token).then((data) => {
+                  //nếu thành công, => popup pản hồi
+                  // lưu vào redux
+                  dispatch(setUserDetail(data));
+                });
               });
-            });
-            // chuyển hướng
-            navigate("/", { replace: true });
-          } else {
-            //alert message nếu thất bại
-            dispatch(alertWarning("login fail"));
-          }
+              // chuyển hướng
+              navigate("/", { replace: true });
+            }
+          });
+        })
+        .catch((err) => {
+          dispatch(alertInfor(err.message.split("(")[1].replace(")", "")));
+          setTimeout(() => {
+            dispatch(alertNull());
+          }, 3000);
         });
-      });
     }
   };
 

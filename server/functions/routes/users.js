@@ -5,7 +5,7 @@ router.get("/", (req, res) => {
   return res.send("inside the user touter");
 });
 
-// verification jwt
+// verification jwt and return user data
 
 router.get("/jwtVerification", async (req, res) => {
   if (!req.headers.authorization) {

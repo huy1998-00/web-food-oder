@@ -6,7 +6,11 @@ import { alertSucess, alertNull } from "../context/actions/alertAcions";
 import { setAllProducts } from "../context/actions/productActions";
 import { getAllProduct, deleteAProduct } from "../API/index";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 const DBItems = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   // products data
   const products = useSelector((state) => state.products.products);
@@ -29,7 +33,7 @@ const DBItems = () => {
             render: (rowData) => (
               <img
                 src={rowData.imageURL}
-                className="w-32 h-16 object-contain rounded-md"
+                className="w-16 h-16 object-contain rounded-md"
               />
             ),
           },
@@ -40,6 +44,10 @@ const DBItems = () => {
           {
             title: "Category",
             field: "product_Category",
+          },
+          {
+            title: "Description",
+            field: "product_description",
           },
           {
             title: "Price",
@@ -60,28 +68,54 @@ const DBItems = () => {
             icon: "edit",
             tooltip: "Edit Data",
             onClick: (event, rowData) => {
-              alert("You want to edit " + rowData.product_id);
+              confirmAlert({
+                title: "You want edit this product ?",
+
+                buttons: [
+                  {
+                    label: "Yes",
+                    onClick: () => {
+                      navigate(`/dashboard/edit/${rowData.product_id}`, {
+                        replace: true,
+                      });
+                    },
+                  },
+                  {
+                    label: "No",
+                    onClick: () => null,
+                  },
+                ],
+              });
             },
           },
           {
             icon: "delete",
             tooltip: "Delete Data",
             onClick: (event, rowData) => {
-              if (
-                window.confirm("Are you sure, you want to perform this aciton")
-              ) {
-                // call API
-                deleteAProduct(rowData.product_id).then((res) => {
-                  dispatch(alertSucess("Product Deleted "));
-                  setInterval(() => {
-                    dispatch(alertNull());
-                  }, 3000);
-                  //update redux store
-                  getAllProduct().then((data) => {
-                    dispatch(setAllProducts(data));
-                  });
-                });
-              }
+              confirmAlert({
+                title: "You want edit this product ?",
+
+                buttons: [
+                  {
+                    label: "Yes",
+                    onClick: () => {
+                      deleteAProduct(rowData.product_id).then((res) => {
+                        dispatch(alertSucess("Product Deleted "));
+                        setTimeout(() => {
+                          dispatch(alertNull());
+                        }, 3000);
+                        getAllProduct().then((data) => {
+                          dispatch(setAllProducts(data));
+                        });
+                      });
+                    },
+                  },
+                  {
+                    label: "No",
+                    onClick: () => null,
+                  },
+                ],
+              });
             },
           },
         ]}
@@ -90,4 +124,15 @@ const DBItems = () => {
   );
 };
 
+// // call API
+// deleteAProduct(rowData.product_id).then((res) => {
+//   dispatch(alertSucess("Product Deleted "));
+//   setInterval(() => {
+//     dispatch(alertNull());
+//   }, 3000);
+//   //update redux store
+//   getAllProduct().then((data) => {
+//     dispatch(setAllProducts(data));
+//   });
+// });
 export default DBItems;
