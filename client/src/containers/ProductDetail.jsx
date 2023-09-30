@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Header, Cart, FeedBack } from "../components/index";
 import { useSelector, useDispatch } from "react-redux";
 import { addNewItemToCart, getAllCartItems } from "../API/index";
@@ -11,10 +11,14 @@ import Modal from "@mui/material/Modal";
 import { average } from "../ultis/styles";
 import { getProductById, sendFeedback, getFeedbackById } from "../API";
 import { setCartItems } from "../context/actions/cartAction";
-import { alertSucess, alertNull } from "../context/actions/alertAcions";
+import {
+  alertSucess,
+  alertNull,
+  alertInfor,
+} from "../context/actions/alertAcions";
 const ProductDetail = () => {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   // product State
   const [detail, setdetail] = useState(null);
   const [feedback, setFeedback] = useState(null);
@@ -42,18 +46,26 @@ const ProductDetail = () => {
   const sendToCart = () => {
     const data = { ...detail };
 
-    //call APi
-    addNewItemToCart(user?.user_id, data).then((res) => {
-      getAllCartItems(user?.user_id).then((items) => {
-        //update cart in redux
-        dispatch(setCartItems(items));
+    if (user) {
+      //call APi
+      addNewItemToCart(user?.user_id, data).then((res) => {
+        getAllCartItems(user?.user_id).then((items) => {
+          //update cart in redux
+          dispatch(setCartItems(items));
+        });
+        // popup message
+        dispatch(alertSucess("Item added to cart"));
+        setInterval(() => {
+          dispatch(alertNull());
+        }, 3000);
       });
-      // popup message
-      dispatch(alertSucess("Item added to cart"));
-      setInterval(() => {
+    } else {
+      dispatch(alertInfor("You need login"));
+      setTimeout(() => {
         dispatch(alertNull());
+        navigate("/login", { replace: true });
       }, 3000);
-    });
+    }
   };
 
   //function handle send feedback

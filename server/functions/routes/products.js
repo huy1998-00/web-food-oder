@@ -3,11 +3,12 @@ const admin = require("firebase-admin");
 const db = admin.firestore();
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 const express = require("express");
+const isAuth = require("../middleware/isAuth");
 // const endpointSecret = process.env.WEBHOOK_SECRET;
 
 // PRODUCT===================================================================================
 // create product
-router.post("/create", async (req, res) => {
+router.post("/create", isAuth, async (req, res) => {
   try {
     const id = Date.now();
     const data = {
@@ -26,7 +27,7 @@ router.post("/create", async (req, res) => {
   }
 });
 //update product
-router.post("/update", async (req, res) => {
+router.post("/update", isAuth, async (req, res) => {
   try {
     const id = req.body.product_id;
     const updateData = {
@@ -66,7 +67,7 @@ router.get("/all", async (req, res) => {
 
 //delete product
 
-router.delete("/delete/:productId", async (req, res) => {
+router.delete("/delete/:productId", isAuth, async (req, res) => {
   const productId = req.params.productId;
   try {
     await db
@@ -100,7 +101,7 @@ router.get("/detail/:id", async (req, res) => {
 
 //CART========================================================================================
 // add product to cart
-router.post("/addToCart/:userId", async (req, res) => {
+router.post("/addToCart/:userId", isAuth, async (req, res) => {
   const userId = req.params.userId;
   const productId = req.body.product_id;
   try {
@@ -144,7 +145,7 @@ router.post("/addToCart/:userId", async (req, res) => {
 });
 
 //update cart items
-router.post("/updateCart/:user_id", async (req, res) => {
+router.post("/updateCart/:user_id", isAuth, async (req, res) => {
   const userId = req.params.user_id;
   const productId = req.query.productId;
   const type = req.query.type;
@@ -200,7 +201,7 @@ router.post("/updateCart/:user_id", async (req, res) => {
 
 // get item in user cart
 
-router.get("/getCartItems/:userId", async (req, res) => {
+router.get("/getCartItems/:userId", isAuth, async (req, res) => {
   const userId = req.params.userId;
 
   (async () => {
@@ -406,7 +407,7 @@ router.get("/orders", async (req, res) => {
 });
 
 // update the order status
-router.post("/updateOrder/:order_id", async (req, res) => {
+router.post("/updateOrder/:order_id", isAuth, async (req, res) => {
   const order_id = req.params.order_id;
   const sts = req.query.sts;
 

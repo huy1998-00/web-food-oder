@@ -17,6 +17,9 @@ import { setCartItems } from "./context/actions/cartAction";
 import CheckoutSuccess from "./components/CheckoutSuccess";
 import UserOrder from "./components/UserOrder";
 import ProductDetail from "./containers/ProductDetail";
+import Page404 from "./components/Page404";
+import ProtectRoutes from "./mdw/ProtectRoutes";
+import About from "./containers/About";
 const App = () => {
   const firebaseAuth = getAuth(app);
   const [isLoadding, setIsLoadding] = useState(false);
@@ -67,7 +70,9 @@ const App = () => {
         <Route path="/login" element={<Login></Login>}></Route>
 
         {/* cần fix route này chỉ có admin có thể truy cập được */}
-        <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
+        <Route element={<ProtectRoutes></ProtectRoutes>}>
+          <Route path="/dashboard/*" element={<DashBoard></DashBoard>}></Route>
+        </Route>
         <Route
           path="/checkout-success"
           element={<CheckoutSuccess></CheckoutSuccess>}
@@ -77,6 +82,8 @@ const App = () => {
           path="/productdetail/:id"
           element={<ProductDetail></ProductDetail>}
         ></Route>
+        <Route path="/404" element={<Page404></Page404>}></Route>
+        <Route path="/about" element={<About></About>}></Route>
       </Routes>
 
       {/* alert popup message */}

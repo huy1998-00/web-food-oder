@@ -1,6 +1,8 @@
 import axios from "axios";
 
 export const baseURL = "http://localhost:5001/foododer20/us-central1/app";
+
+const UserToken = localStorage.getItem("token") || "";
 //USer====================
 /// validate token function
 export const validateUserJWT = async (token) => {
@@ -29,7 +31,13 @@ export const getAllUsers = async () => {
 // them san pham
 export const addNewProduct = async (data) => {
   try {
-    const res = await axios.post(`${baseURL}/api/products/create`, { ...data });
+    const res = await axios.post(
+      `${baseURL}/api/products/create`,
+      { ...data },
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
+    );
 
     return res.data.data;
   } catch (error) {
@@ -40,7 +48,13 @@ export const addNewProduct = async (data) => {
 // edit
 export const editAProduct = async (data) => {
   try {
-    const res = await axios.post(`${baseURL}/api/products/update`, { ...data });
+    const res = await axios.post(
+      `${baseURL}/api/products/update`,
+      { ...data },
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
+    );
 
     return res.data.data;
   } catch (error) {
@@ -51,7 +65,9 @@ export const editAProduct = async (data) => {
 
 export const getAllProduct = async () => {
   try {
-    const res = await axios.get(`${baseURL}/api/products/all`);
+    const res = await axios.get(`${baseURL}/api/products/all`, {
+      headers: { Authorization: `Bearer ` + UserToken },
+    });
 
     return res.data.data;
   } catch (error) {
@@ -63,7 +79,10 @@ export const getAllProduct = async () => {
 export const deleteAProduct = async (productId) => {
   try {
     const res = await axios.delete(
-      `${baseURL}/api/products/delete/${productId}`
+      `${baseURL}/api/products/delete/${productId}`,
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
     );
 
     return res.data.data;
@@ -83,8 +102,6 @@ export const getProductById = async (id) => {
   }
 };
 
-//update product by id
-
 ///===========Cart
 
 // add to cart
@@ -92,7 +109,10 @@ export const addNewItemToCart = async (userId, data) => {
   try {
     const res = await axios.post(
       `${baseURL}/api/products/addToCart/${userId}`,
-      { ...data }
+      { ...data },
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
     );
     return res.data.data;
   } catch (error) {
@@ -103,7 +123,10 @@ export const addNewItemToCart = async (userId, data) => {
 export const getAllCartItems = async (userId) => {
   try {
     const res = await axios.get(
-      `${baseURL}/api/products/getCartItems/${userId}`
+      `${baseURL}/api/products/getCartItems/${userId}`,
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
     );
     return res.data.data;
   } catch (error) {
@@ -117,7 +140,11 @@ export const updateCartItems = async (user_id, productId, type) => {
     const res = await axios.post(
       `${baseURL}/api/products/updateCart/${user_id}`,
       null,
-      { params: { productId: productId, type: type } }
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+
+        params: { productId: productId, type: type },
+      }
     );
     return res.data.data;
   } catch (error) {
@@ -129,7 +156,9 @@ export const updateCartItems = async (user_id, productId, type) => {
 //==================Order=================
 export const getAllOrder = async () => {
   try {
-    const res = await axios.get(`${baseURL}/api/products/orders`);
+    const res = await axios.get(`${baseURL}/api/products/orders`, {
+      headers: { Authorization: `Bearer ` + UserToken },
+    });
 
     return res.data.data;
   } catch (error) {
@@ -143,7 +172,11 @@ export const updateOrderSts = async (order_id, sts) => {
     const res = await axios.post(
       `${baseURL}/api/products/updateOrder/${order_id}`,
       null,
-      { params: { sts: sts } }
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+
+        params: { sts: sts },
+      }
     );
     return res.data.data;
   } catch (error) {
@@ -156,7 +189,13 @@ export const updateOrderSts = async (order_id, sts) => {
 ///====================Feedback==============
 export const sendFeedback = async (data) => {
   try {
-    const res = await axios.post(`${baseURL}/api/feedback/create`, { ...data });
+    const res = await axios.post(
+      `${baseURL}/api/feedback/create`,
+      { ...data },
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
+    );
 
     return res.data.data;
   } catch (error) {
@@ -166,7 +205,7 @@ export const sendFeedback = async (data) => {
 
 export const getFeedbackById = async (id) => {
   try {
-    const res = await axios.get(`${baseURL}/api/feedback/get/${id}`, null, {});
+    const res = await axios.get(`${baseURL}/api/feedback/get/${id}`);
 
     return res.data.data;
   } catch (error) {}

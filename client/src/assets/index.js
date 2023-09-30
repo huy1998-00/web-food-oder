@@ -6,3 +6,4 @@ export { default as Delivery } from "./img/delivery.png";
 export { default as HeroBg } from "./img/heroBg.png";
 export { default as Bill } from "./img/bill.jpg";
 export { default as Avatar2 } from "./img/avt2.png";
+export { default as img404 } from "./img/3814348.jpg";

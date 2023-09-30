@@ -53,6 +53,9 @@ const Login = () => {
             validateUserJWT(token).then((data) => {
               // lưu vào redux
               dispatch(setUserDetail(data));
+              //luu vao local storage
+              localStorage.setItem("token", token);
+              localStorage.setItem("userId", data.user_id);
             });
           });
         }
@@ -99,6 +102,9 @@ const Login = () => {
                     setIsSignUp(false);
                     // lưu vào redux
                     dispatch(setUserDetail(data));
+                    //luu vao local storage
+                    localStorage.setItem("token", token);
+                    localStorage.setItem("userId", data.user_id);
                   });
                   /// cần xử lý popup message phản hổi từ backend (nêu tạo thành công hoac thất bại)
                 });
@@ -138,6 +144,9 @@ const Login = () => {
                   //nếu thành công, => popup pản hồi
                   // lưu vào redux
                   dispatch(setUserDetail(data));
+                  //luu vao local storage
+                  localStorage.setItem("token", token);
+                  localStorage.setItem("userId", data.user_id);
                 });
               });
               // chuyển hướng

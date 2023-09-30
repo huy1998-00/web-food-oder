@@ -27,6 +27,7 @@ const Header = () => {
   const signOut = () => {
     fireBaseAuth.signOut().then(() => {
       dispatch(setUserNull());
+      localStorage.removeItem("token");
       navigate("/login", { replace: true });
     });
   };
@@ -48,23 +49,6 @@ const Header = () => {
             to={"/"}
           >
             Home
-          </NavLink>
-          <NavLink
-            className={({ isActive }) =>
-              isActive ? isActiveStyles : isNotActiveStyles
-            }
-            to={"/menu"}
-          >
-            Menu
-          </NavLink>
-
-          <NavLink
-            className={({ isActive }) =>
-              isActive ? isActiveStyles : isNotActiveStyles
-            }
-            to={"/service"}
-          >
-            Services
           </NavLink>
 
           <NavLink
