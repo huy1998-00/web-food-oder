@@ -38,7 +38,7 @@ module.exports = {
         620: "620px",
       },
       screens: {
-        sm: "640px",
+        sm: "375px",
         md: "768px",
         lg: "1024px",
         xl: "1800px",
@@ -55,8 +55,8 @@ module.exports = {
         cartBg: "#282a2c",
         cartItem: "#2e3033",
         cartTotal: "#343739",
+        brownbg: "#2b1e16",
       },
     },
   },
-  plugins: [require("tailwind-scrollbar")],
 };

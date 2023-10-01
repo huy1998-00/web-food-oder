@@ -55,7 +55,7 @@ const App = () => {
     });
   }, []);
   return (
-    <div className="w-screen min-h-screen h-auto flex flex-col items-center justify-center">
+    <div className="w-screen min-h-screen h-auto flex flex-col items-center justify-center overflow-y-hidden">
       {/* loading screen */}
       {isLoadding && (
         <motion.div

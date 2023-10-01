@@ -107,15 +107,21 @@ const ProductDetail = () => {
           {/* block for image and infor */}
           <div className="basis-4/12  sm:flex sm:justify-center sm:items-center">
             {/* image */}
-            <img src={detail?.imageURL} className=" sm:w-8/12   " alt="" />
+            <img
+              src={detail?.imageURL}
+              className=" sm:w-8/12  sm:h-[70%] md:w-full h-full "
+              alt=""
+            />
           </div>
           <div className="basis-7/12 flex flex-col  ">
             {/* block for infor */}
-            <h1 className="text-headingColor text-5xl font-extrabold ">
+            <h1 className="text-headingColor lg:text-5xl md:text-3xl sm:text-2xl font-extrabold ">
               {detail?.product_name}
             </h1>
-            <div className="text-3xl font-semibold text-red-500 flex  justify-start gap-5 my-4">
-              <p className="text-lg ">{`${average(detail?.rating)} / 5`}</p>
+            <div className="lg:text-3xl md:text-2xl sm:text-lg font-semibold text-red-500 flex  justify-start gap-5 my-4">
+              <p className="lg:text-lg md:text-lg sm:text-[14px] ">{`${average(
+                detail?.rating
+              )} / 5`}</p>
               <Rating
                 value={average(detail?.rating)}
                 onChange={(event, newValue) =>
