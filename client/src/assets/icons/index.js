@@ -12,6 +12,8 @@ import {
   MdSearch,
   MdDelete,
   MdStarRate,
+  MdImageSearch,
+  MdAttachFile,
 } from "react-icons/md";
 import {
   BsToggles2,
@@ -42,4 +44,6 @@ export {
   FaArrowLeft,
   HiCurrencyRupee,
   MdStarRate,
+  MdImageSearch,
+  MdAttachFile,
 };

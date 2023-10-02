@@ -31,6 +31,7 @@ module.exports = {
         685: "685px",
         800: "800px",
         "90vh": "90vh",
+        calc: "calc(100% - 112px)",
       },
       minWidth: {
         210: "210px",
