@@ -4,6 +4,8 @@ const db = admin.firestore();
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 const express = require("express");
 const isAuth = require("../middleware/isAuth");
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_KEY);
 // const endpointSecret = process.env.WEBHOOK_SECRET;
 
 // PRODUCT===================================================================================
@@ -201,7 +203,7 @@ router.post("/updateCart/:user_id", isAuth, async (req, res) => {
 
 // get item in user cart
 
-router.get("/getCartItems/:userId", isAuth, async (req, res) => {
+router.get("/getCartItems/:userId", async (req, res) => {
   const userId = req.params.userId;
 
   (async () => {
@@ -294,7 +296,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
 let endpointSecret;
 // endpointSecret = process.env.WEBHOOK_SECRET;
-
+// listen event send from stripe
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -322,8 +324,8 @@ router.post(
     // Handle the event
     if (eventType === "checkout.session.completed") {
       stripe.customers.retrieve(data.customer).then((customer) => {
-        console.log("Customer details", customer);
-        console.log("Data", data);
+        // console.log("Customer details", customer);
+        // console.log("Data", data);
 
         ///call helper function create Order
         createOrder(customer, data, res);
@@ -354,9 +356,19 @@ const createOrder = async (customer, intent, res) => {
       total: customer.metadata.total,
       sts: "preparing",
     };
+
+    const dataInvoice = {
+      email: customer.email,
+      items: JSON.parse(customer.metadata.cart),
+      invoice_prefix: customer.invoice_prefix,
+      total: customer.metadata.total,
+      shipping_details: intent.shipping_details,
+      orderId: orderId,
+    };
     //create order
     await db.collection("orders").doc(`/${orderId}/`).set(data);
-
+    //send Invoice-confirm email
+    await sendInvl(dataInvoice);
     //remove cart
     deleteCart(customer.metadata.user_id, JSON.parse(customer.metadata.cart));
     console.log("*****************************************");
@@ -366,15 +378,133 @@ const createOrder = async (customer, intent, res) => {
     console.log(err);
   }
 };
+//helper function send invoice
+
+const sendInvl = async (data) => {
+  console.log("inside sent mail");
+  const msg = {
+    to: data.email, // Change to your recipient
+    from: "huydqfx17618@funix.edu.vn", // Change to your verified sender
+    subject: "Invoice - Confirm Order",
+    text: "Invoice - Confirm Order",
+    html: `
+        <body>
+          <div style="padding: 10px;">
+            <table style="width: 100%;">
+              <tr style="width: 100%;">
+                <td style="width: 50%;">
+                  <label style="font-size: 40px; font-weight: bold;">INV-${
+                    data.invoice_prefix
+                  }</label>
+                </td>
+                <td style="width: 50%; text-align: right;">
+                 <p>ORDER: ${data.orderId}</p>
+                </td>
+              </tr>
+            </table>
+            <table style="width: 100%; margin: 10px 0px;">
+              <tr style="width: 100%;">
+                <td style="width: 33%; line-height: 25px;">
+                  <label>From</label><br />
+                  <label style="font-weight: bold; font-size: 20px;"
+                    >HFood</label
+                  >
+                  <br />
+                  Ha Noi <br />
+                  Ha Noi <br />
+                </td>
+                <td style="width: 33%; line-height: 25px;">
+                  <label>To</label><br />
+                  <label style="font-weight: bold; font-size: 20px;"
+                    >${data.shipping_details.name}</label
+                  ><br />
+                  ${data.shipping_details.address.line1} <br />
+                  ${data.shipping_details.address.line2} <br />
+                </td>
+                <td style="width: 33%; margin: auto;">
+                  <span
+                    style="
+                      background: #e1e1e1;
+                      font-size: 30px;
+                      font-weight: bold;
+                      padding: 10px;
+                      color: #343a40;
+                    "
+                  >
+                    PAID</span
+                  >
+                </td>
+              </tr>
+            </table>
+            <table style="width: 100%;">
+              <tr style="background: #343a40; color: white;">
+                <th style="padding: 10px;">
+                  Product name
+                </th>
+                <th>
+                  Amount
+                </th>
+                <th>
+                Sub Total
+                </th>
+              </tr>
+             ${data.items.map((item) => {
+               return `
+               <tr>
+               <td>
+                 ${item.product_name}
+               </td>
+               <td>
+                 ${item.quantity}
+               </td>
+               <td>
+                 ${parseInt(item.product_price) * parseInt(item.quantity)}
+               </td>
+             </tr>
+               
+               `;
+             })}
+            </table>
+            <table style="width: 100%; margin-top: 25px;">
+        <tr style="background: #060606; color: white; font-size:20px">
+          <th style="padding: 15px;">
+            Total
+          </th>
+          <th style="padding: 15px;">
+            ${data.total}
+          </th>
+        </tr>
+      </table>
+        </div>
+
+            
+          </div>
+        </body>
+      
+      `,
+  };
+
+  sgMail
+    .send(msg)
+    .then((response) => {
+      // console.log(response[0].statusCode);
+      // console.log(response[0].headers);
+      console.log("sent email...");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
 // helper function delete
 const deleteCart = async (userId, items) => {
   console.log("Inside the delete");
 
-  console.log(userId);
+  // console.log(userId);
 
   console.log("*****************************************");
   items.map(async (data) => {
-    console.log("-------------------inside--------", userId, data.productId);
+    // console.log("-------------------inside--------", userId, data.productId);
     await db
       .collection("cartItems")
       .doc(`/${userId}/`)

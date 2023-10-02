@@ -9,6 +9,7 @@ import {
   DBEditProduct,
 } from "../components/index";
 import { Route, Routes } from "react-router-dom";
+import AdminChatRoute from "./AdminChat/AdminChatRoute";
 const DBRightSection = () => {
   return (
     <div className="flex flex-col pt-10 px-10 flex-1 h-full ">
@@ -25,6 +26,10 @@ const DBRightSection = () => {
           <Route
             path="/edit/:id"
             element={<DBEditProduct></DBEditProduct>}
+          ></Route>
+          <Route
+            path="/chat"
+            element={<AdminChatRoute></AdminChatRoute>}
           ></Route>
         </Routes>
       </div>

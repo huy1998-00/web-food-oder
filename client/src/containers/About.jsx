@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Header } from "../components";
 import {
   AppleImg,
@@ -13,7 +13,30 @@ import {
 import { motion } from "framer-motion";
 import { ButtonClick } from "../animations/index";
 import Typewriter from "typewriter-effect";
+import { subcribleUser } from "../API/index";
+import { sendEmailVerification } from "firebase/auth";
 const About = () => {
+  const inputEmail = useRef();
+
+  //VALIDATE
+  function isValidEmail(email) {
+    return /\S+@\S+\.\S+/.test(email);
+  }
+
+  //function handle user subcrible
+
+  const postSubcribleUser = () => {
+    const data = {
+      email: inputEmail.current.value,
+    };
+
+    if (isValidEmail(data.email)) {
+      subcribleUser(data)
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
+    }
+  };
+
   return (
     <main className="flex w-screen min-h-screen flex-col items-center justify-start bg-primary overflow-y-hidden">
       <Header></Header>
@@ -60,9 +83,11 @@ const About = () => {
                     type="text"
                     className="w-[80%]   border-gray-400 border focus:border-orange-400 p-4  font-semibold  "
                     placeholder="Enter your email here..."
+                    ref={inputEmail}
                   />
                   <motion.button
                     {...ButtonClick}
+                    onClick={postSubcribleUser}
                     className="flex items-center justify-center bg-orange-500 text-white  font-bold p-4  flex-1 max-sm:text-sm  "
                   >
                     SUBSCRIBLE

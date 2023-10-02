@@ -25,6 +25,15 @@ export const getAllUsers = async () => {
   }
 };
 
+export const subcribleUser = async (data) => {
+  try {
+    const res = await axios.post(`${baseURL}/api/users/subcrible`, { ...data });
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+};
+
 //===============//========================
 
 //Product===========

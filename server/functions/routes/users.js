@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const admin = require("firebase-admin");
-
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_KEY);
 router.get("/", (req, res) => {
   return res.send("inside the user touter");
 });
@@ -60,6 +61,30 @@ router.get("/all", async (req, res) => {
       msg: `Error in listing users :,${er}`,
     });
   }
+});
+
+router.post("/subcrible", (req, res) => {
+  const userEmail = req.body.email;
+  console.log(userEmail);
+
+  const msg = {
+    to: userEmail, // Change to your recipient
+    from: "huydqfx17618@funix.edu.vn", // Change to your verified sender
+    subject: "Test sending Voucher code",
+    text: "asdasdasd",
+    html: "<strong>NUHENMS</strong>",
+  };
+
+  sgMail
+    .send(msg)
+    .then((response) => {
+      console.log(response[0].statusCode);
+      console.log(response[0].headers);
+      return res.status(200).send({ response });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 });
 
 module.exports = router;
