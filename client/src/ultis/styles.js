@@ -30,6 +30,7 @@ export const statuses = [
   { id: 6, title: "Chicken", category: "chicken" },
 ];
 
+const category = ["drinks", "deserts", "fruits", "rice", "icecream", "chicken"];
 ///dummy data can delete later
 export const randomData = [
   {

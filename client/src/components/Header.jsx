@@ -28,6 +28,7 @@ const Header = () => {
     fireBaseAuth.signOut().then(() => {
       dispatch(setUserNull());
       localStorage.removeItem("token");
+      localStorage.removeItem("userId");
       navigate("/login", { replace: true });
     });
   };

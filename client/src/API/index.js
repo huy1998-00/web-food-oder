@@ -15,6 +15,22 @@ export const validateUserJWT = async (token) => {
     return error;
   }
 };
+///create user in user Collection
+
+export const createUser = async (data) => {
+  try {
+    const res = await axios.post(
+      `${baseURL}/api/users/create`,
+      { ...data },
+      {
+        headers: { Authorization: `Bearer ` + UserToken },
+      }
+    );
+    return res.data.data;
+  } catch (error) {
+    return error;
+  }
+};
 
 export const getAllUsers = async () => {
   try {
@@ -47,7 +63,6 @@ export const addNewProduct = async (data) => {
         headers: { Authorization: `Bearer ` + UserToken },
       }
     );
-
     return res.data.data;
   } catch (error) {
     return error;

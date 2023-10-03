@@ -7,6 +7,7 @@ import {
   alertDanger,
   alertNull,
   alertSucess,
+  alertInfor,
 } from "../context/actions/alertAcions";
 import {
   ref,
@@ -102,7 +103,7 @@ const DBNewItem = () => {
 
   // function handle submit new data
 
-  const submitNewData = () => {
+  const submitNewData = async () => {
     const data = {
       product_name: itemName,
       product_Category: category,
@@ -111,27 +112,36 @@ const DBNewItem = () => {
       imageURL: imageDownloadURL,
     };
     // call API
-    addNewProduct(data)
-      .then((res) => {
-        //allert message if success
 
-        setItemName("");
-        setImageDownloadURL("");
-        setPrice("");
-        setdescription("");
-        setcategory(null);
-        dispatch(alertSucess("Succes add product"));
-        // update redux
-        getAllProduct().then((data) => {
-          dispatch(setAllProducts(data));
-        });
-        setTimeout(() => {
-          dispatch(alertNull());
-        }, 3000);
-      })
-      .catch((err) => {
-        console.log(err);
+    try {
+      await addNewProduct(data).then((res) => {
+        //allert message if success
+        console.log(res);
+        if (res.response?.status !== 422) {
+          console.log("running");
+          setItemName("");
+          setImageDownloadURL("");
+          setPrice("");
+          setdescription("");
+          setcategory(null);
+          dispatch(alertSucess("Succes add product"));
+          // update redux
+          getAllProduct().then((data) => {
+            dispatch(setAllProducts(data));
+          });
+          setTimeout(() => {
+            dispatch(alertNull());
+          }, 3000);
+        } else {
+          dispatch(alertInfor("Required field should not emty"));
+          setTimeout(() => {
+            dispatch(alertNull());
+          }, 3000);
+        }
       });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

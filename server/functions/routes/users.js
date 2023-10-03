@@ -1,10 +1,9 @@
 const router = require("express").Router();
 const admin = require("firebase-admin");
 const sgMail = require("@sendgrid/mail");
+const db = admin.firestore();
+
 sgMail.setApiKey(process.env.SENDGRID_KEY);
-router.get("/", (req, res) => {
-  return res.send("inside the user touter");
-});
 
 // verification jwt and return user data
 
@@ -29,6 +28,27 @@ router.get("/jwtVerification", async (req, res) => {
   } catch (error) {
     //handle err
 
+    res.status(500).send({
+      succes: false,
+      msg: error,
+    });
+  }
+});
+
+router.post("/create", async (req, res) => {
+  try {
+    const id = req.body.id;
+    const data = {
+      email: req.body.email,
+      id: req.body.id,
+    };
+    console.log(id, data);
+    /// create user in users collection
+    await db.collection("users").doc(`/${id}/`).set(data);
+    /// create conversation from user to admin
+    await db.collection("userChats").doc(`/${id}/`).set({});
+    return res.status(200).send({ succes: true });
+  } catch (error) {
     res.status(500).send({
       succes: false,
       msg: error,

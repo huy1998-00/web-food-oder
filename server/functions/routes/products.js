@@ -6,51 +6,99 @@ const express = require("express");
 const isAuth = require("../middleware/isAuth");
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_KEY);
+const { body } = require("express-validator");
+const { validationResult } = require("express-validator");
+
 // const endpointSecret = process.env.WEBHOOK_SECRET;
 
 // PRODUCT===================================================================================
 // create product
-router.post("/create", isAuth, async (req, res) => {
-  try {
-    const id = Date.now();
-    const data = {
-      product_id: id,
-      product_name: req.body.product_name,
-      product_Category: req.body.product_Category,
-      product_price: req.body.product_price,
-      product_description: req.body.product_description,
-      imageURL: req.body.imageURL,
-      rating: [5],
-    };
-    const response = db.collection("products").doc(`/${id}/`).set(data);
-    return res.status(200).send({ succes: true, data: response });
-  } catch (error) {
-    return res.status(500).send({ succes: false, msg: error });
+router.post(
+  "/create",
+  isAuth,
+  [
+    body("product_name", "Invalid product name").exists({ checkFalsy: true }),
+    body("product_price", "Invalid product price").isFloat({ min: 0 }),
+    body("product_description", "Invalid product descrition").exists({
+      checkFalsy: true,
+    }),
+    body("imageURL", "Invalid imageURL").isURL(),
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const error = new Error("Validation failed.");
+      error.statusCode = 422;
+      error.data = errors.array();
+
+      next(error);
+    } else {
+      const id = Date.now();
+      const data = {
+        product_id: id,
+        product_name: req.body.product_name,
+        product_Category: req.body.product_Category,
+        product_price: req.body.product_price,
+        product_description: req.body.product_description,
+        imageURL: req.body.imageURL,
+        rating: [5],
+      };
+      try {
+        const response = db.collection("products").doc(`/${id}/`).set(data);
+        return res.status(200).send({ succes: true, data: response });
+      } catch (error) {
+        next(error);
+      }
+    }
   }
-});
+);
 //update product
-router.post("/update", isAuth, async (req, res) => {
-  try {
-    const id = req.body.product_id;
-    const updateData = {
-      product_name: req.body.product_name,
-      product_Category: req.body.product_Category,
-      product_price: req.body.product_price,
-      product_description: req.body.product_description,
-      imageURL: req.body.imageURL,
-    };
-    const response = db
-      .collection("products")
-      .doc(`/${id}/`)
-      .update(updateData);
-    return res.status(200).send({ succes: true, data: response });
-  } catch (error) {
-    return res.status(500).send({ succes: false, msg: error });
+router.post(
+  "/update",
+  isAuth,
+  [
+    body("product_name", "Invalid product name").exists({ checkFalsy: true }),
+
+    body("product_price", "Invalid product price").isFloat({ min: 0 }),
+    body("product_description", "Invalid product descrition").exists({
+      checkFalsy: true,
+    }),
+    body("imageURL", "Invalid imageURL").isURL(),
+  ],
+  async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const error = new Error("Validation failed.");
+      error.statusCode = 422;
+      error.data = errors.array();
+
+      next(error);
+    } else {
+      const id = req.body.product_id;
+      const updateData = {
+        product_name: req.body.product_name,
+        product_Category: req.body.product_Category,
+        product_price: req.body.product_price,
+        product_description: req.body.product_description,
+        imageURL: req.body.imageURL,
+      };
+      try {
+        const response = db
+          .collection("products")
+          .doc(`/${id}/`)
+          .update(updateData);
+        return res.status(200).send({ succes: true, data: response });
+      } catch (error) {
+        next(error);
+      }
+    }
   }
-});
+);
 
 // get all products
-router.get("/all", async (req, res) => {
+router.get("/all", async (req, res, next) => {
   try {
     let query = db.collection("products");
     let response = [];
@@ -63,13 +111,13 @@ router.get("/all", async (req, res) => {
     });
     return res.status(200).send({ success: true, data: response });
   } catch (err) {
-    return res.send({ success: false, msg: `Error :${err}` });
+    next(err);
   }
 });
 
 //delete product
 
-router.delete("/delete/:productId", isAuth, async (req, res) => {
+router.delete("/delete/:productId", isAuth, async (req, res, next) => {
   const productId = req.params.productId;
   try {
     await db
@@ -80,7 +128,7 @@ router.delete("/delete/:productId", isAuth, async (req, res) => {
         return res.status(200).send({ success: true, data: result });
       });
   } catch (err) {
-    return res.send({ success: false, msg: `Error :${err}` });
+    next(err);
   }
 });
 
@@ -95,7 +143,7 @@ router.get("/detail/:id", async (req, res) => {
 
     return res.status(200).send({ success: true, data: response.data() });
   } catch (error) {
-    return res.send({ success: false, msg: `Error :${error}` });
+    next(err);
   }
 });
 
@@ -142,7 +190,7 @@ router.post("/addToCart/:userId", isAuth, async (req, res) => {
       return res.status(200).send({ success: true, data: addItems });
     }
   } catch (error) {
-    return res.send({ success: false, msg: `Error :${error}` });
+    next(err);
   }
 });
 
@@ -198,12 +246,14 @@ router.post("/updateCart/:user_id", isAuth, async (req, res) => {
         }
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    next(err);
+  }
 });
 
 // get item in user cart
 
-router.get("/getCartItems/:userId", async (req, res) => {
+router.get("/getCartItems/:userId", async (req, res, next) => {
   const userId = req.params.userId;
 
   (async () => {
@@ -226,13 +276,13 @@ router.get("/getCartItems/:userId", async (req, res) => {
 
       return res.status(200).send({ succes: true, data: response });
     } catch (error) {
-      return res.send({ success: false, msg: `Error :${error}` });
+      next(err);
     }
   })();
 });
 
 // create checkout session
-router.post("/create-checkout-session", async (req, res) => {
+router.post("/create-checkout-session", async (req, res, next) => {
   //filter cart remove URL image
   const shortCart = req.body.data.cart.map((item) => {
     return {
@@ -338,7 +388,7 @@ router.post(
 );
 
 //helper function crete order
-const createOrder = async (customer, intent, res) => {
+const createOrder = async (customer, intent, res, next) => {
   console.log("Inside the orders");
   try {
     const orderId = Date.now();
@@ -375,7 +425,7 @@ const createOrder = async (customer, intent, res) => {
 
     return res.status(200).send({ success: true });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 //helper function send invoice

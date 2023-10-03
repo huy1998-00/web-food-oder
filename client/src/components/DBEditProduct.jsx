@@ -3,7 +3,11 @@ import { useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProductById, getAllProduct, editAProduct } from "../API/index";
 import { setAllProducts } from "../context/actions/productActions";
-import { alertSucess, alertNull } from "../context/actions/alertAcions";
+import {
+  alertSucess,
+  alertNull,
+  alertInfor,
+} from "../context/actions/alertAcions";
 import { motion } from "framer-motion";
 import { ButtonClick } from "../animations/index";
 import { confirmAlert } from "react-confirm-alert"; // Import
@@ -44,16 +48,23 @@ const DBEditProduct = () => {
       product_description: description,
       imageURL: imageURL,
     };
-    console.log(data);
+
     editAProduct(data).then((res) => {
-      dispatch(alertSucess("Product Updated"));
-      setTimeout(() => {
-        dispatch(alertNull());
-        navigate("/dashboard/items", { replace: true });
-      }, 3000);
-      getAllProduct().then((response) => {
-        dispatch(setAllProducts(response));
-      });
+      if (res.response?.status !== 422) {
+        dispatch(alertSucess("Product Updated"));
+        setTimeout(() => {
+          dispatch(alertNull());
+          navigate("/dashboard/items", { replace: true });
+        }, 3000);
+        getAllProduct().then((response) => {
+          dispatch(setAllProducts(response));
+        });
+      } else {
+        dispatch(alertInfor("Required field should not emty"));
+        setTimeout(() => {
+          dispatch(alertNull());
+        }, 3000);
+      }
     });
   };
 

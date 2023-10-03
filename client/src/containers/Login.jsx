@@ -14,7 +14,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { app } from "../config/filebase.config";
-import { validateUserJWT } from "../API";
+import { validateUserJWT, createUser } from "../API";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetail } from "../context/actions/userActions";
 import {
@@ -51,6 +51,12 @@ const Login = () => {
           cred.getIdToken().then((token) => {
             //lấy token người dùng gửi về backend qua API và nhận phản hồi
             validateUserJWT(token).then((data) => {
+              const userInfo = {
+                id: data.uid,
+                email: data.email,
+              };
+
+              createUser(userInfo);
               // lưu vào redux
               dispatch(setUserDetail(data));
               //luu vao local storage
@@ -91,13 +97,16 @@ const Login = () => {
           .then((Usercred) => {
             firebaseAuth.onAuthStateChanged((cred) => {
               if (cred) {
-                cred.getIdToken().then((token) => {
+                cred.getIdToken({ forceRefresh: true }).then((token) => {
                   //lấy token người dùng gửi về backend qua API và nhận phản hồi
                   validateUserJWT(token).then((data) => {
-                    userEmail.current.value = "";
-                    userPassword.current.value = "";
+                    //create user in DB
+                    const userInfo = {
+                      id: data.uid,
+                      email: data.email,
+                    };
 
-                    confirm_Password.current.value = "";
+                    createUser(userInfo);
 
                     setIsSignUp(false);
                     // lưu vào redux
@@ -136,6 +145,7 @@ const Login = () => {
         userPassword.current.value
       )
         .then((userCred) => {
+          console.log(userCred);
           firebaseAuth.onAuthStateChanged((cred) => {
             if (cred) {
               cred.getIdToken().then((token) => {

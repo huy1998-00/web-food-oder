@@ -20,6 +20,7 @@ const DBHeader = () => {
       .signOut()
       .then(() => {
         dispatch(setUserNull());
+        localStorage.clear();
         navigate("/login", { replace: true });
       })
       .catch((err) => console.log(err));
